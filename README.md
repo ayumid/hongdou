@@ -1,39 +1,27 @@
-# hongdou
+# 红豆
 
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+#### Bloom OS介绍
+**Bloom OS 明月版 基于asr1601/asr1603/asr1606 cat.1芯片开发**
 
 #### 软件架构
-软件架构说明
-
+hongdou ------ amaziot_bloom_os_sdk -----包含bloom os平台驱动，示例等
+            download -----------------下载工具和编译需要的bin文件，包括固定的bin文件和编译生成的cp.bin
+            fota_tool-----------------差分升级包生成批处理和教程
+            framework-----------------系统框架
+            include-------------------一些头文件
+            out-----------------------编译生成的cp.bin临时目录，build.bat内已经把生成的文件移动到了download/about.../inage/文件夹
+            prebuilt------------------预编译相关的一些文件，下载后需要替换离线sdk包内对应文件
+            tools---------------------编译需要的一些可执行文件等
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+下载后，放入本地离线SDK中，替换对应文件
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  在amaziot_bloom_os_sdk\examples\路径建立自己的工程文件夹，例如：amaziot_bloom_os_sdk\examples\my_proj
+2.  复制peripherals或者libraries中的一个文件到新建的工程文件夹中,例如：amaziot_bloom_os_sdk\examples\my_proj\DTU\
+3.  在根目录\hongdou，右键执行在此处打开命令行或者powershell(右键打开xxx教程：https://rckrv97mzx.feishu.cn/wiki/wikcnnpgJ1ZrREMjqVlyVMtguMc)
+4.  执行.\build.bat .\amaziot_bloom_os_sdk\examples\peripherals\DTU
+5.  打开hongdou\download\aboot-tools-2021.02.20-win-x64\about.exe，参考教程进行编译（教程：https://rckrv97mzx.feishu.cn/wiki/wikcno9WPmvoX3xIFIgvq0Q1ipd）
 
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)

@@ -1,7 +1,7 @@
 # 红豆
 
 #### Bloom OS介绍
-Bloom OS 明月版 基于asr1601/asr1603/asr1606 cat.1芯片开发  
+Bloom OS 红豆版 基于asr1601/asr1603/asr1606 cat.1芯片开发  
 
 #### 软件架构
 amaziot_bloom_os_sdk 包含bloom os平台驱动，示例等  

@@ -1,0 +1,48 @@
+
+#include "ql_adc_api.h"
+
+/*****************************************************************
+* Function: ql_adc_init
+*
+* Description:
+* 	该函数用于初始化 ADC 寄存器，使用 ADC 前必须进行初始化。该函数无需重复调用。
+* 
+* Parameters:
+* 	NONE
+* Return:
+* 	0 初始化 ADC 寄存器成功
+*	-1 初始化 ADC 寄存器失败
+*
+*****************************************************************/
+int ql_adc_init(void);
+
+/*****************************************************************
+* Function: ql_adc_read
+*
+* Description:
+* 	该函数用于读取 ADC 通道中的模拟电压值。
+* 
+* Parameters:
+* 	adc_channel	  	[in] 	指定 ADC 通道。
+* 	p_batvol	  	[Out] 	量取的电压值。单位：mV。
+* Return:
+* 	0 读取成功
+*	-1 读取失败
+*
+*****************************************************************/
+int ql_adc_read(unsigned char adc_channel, unsigned short *p_batvol);
+
+/*****************************************************************
+* Function: ql_get_cur_source_vol
+*
+* Description:
+* 	读取的外接电源的电压值。    //暂时只适用于KV7
+* 
+* Parameters:
+* 	NONE
+* Return:
+* 	读取的外接电源的电压值
+*
+*****************************************************************/
+int ql_get_cur_source_vol(void);//read adc1 Voltage
+

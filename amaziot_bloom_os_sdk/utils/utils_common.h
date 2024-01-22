@@ -27,9 +27,10 @@
 #define msleep(x) OSATaskSleep((x) * 20)//100*msecond //add by dmh
 
 #undef printf
-#define printf(fmt, args...) do { CPUartLogPrintf("[sdk]"fmt, ##args); } while(0)
 // debug uart log
-#define sdk_uart_printf(fmt, args...) do { RTI_LOG("[sdk]"fmt, ##args); } while(0)
+#define printf(fmt, args...) do { sdklogConfig(0); sdkLogPrintf(fmt, ##args); } while(0)
+// CATStudio usb log
+#define catstudio_printf(fmt, args...) do { sdklogConfig(0); sdkLogPrintf(fmt, ##args); } while(0)
 
 #undef ASSERT
 #define ASSERT(cOND)	{if (!(cOND)) {utilsAssertFail(#cOND, __FILE__, (short)__LINE__, 1);}}

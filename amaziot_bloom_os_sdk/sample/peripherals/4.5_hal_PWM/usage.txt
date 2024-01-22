@@ -1,0 +1,38 @@
+
+#include "ql_pwm_api.h"
+
+typedef enum QL_PWM_CYCLE_RANGE_ENUM
+{
+    QL_PWM_CYCLE_ABOVE_1US,
+	QL_PWM_CYCLE_ABOVE_10US,	
+    QL_PWM_CYCLE_ABOVE_1MS
+} QL_PWM_CYCLE_RANGE_E;
+
+/******************************************************************
+*	 Functions
+******************************************************************/
+
+
+/*
+GPIO NUM : PWMx
+
+GPIO_126: PWM1
+GPIO_08: PWM1
+GPIO_117: PWM1
+GPIO_31: PWM1
+GPIO_09: PWM2
+GPIO_118: PWM2
+GPIO_32: PWM2
+GPIO_10: PWM3
+GPIO_06: PWM3
+GPIO_11: PWM4
+GPIO_07: PWM4
+*/
+
+int ql_pwm_config(unsigned int gpio_num, unsigned short high_time, unsigned short cycle_time);
+
+int ql_pwm_enable(unsigned int gpio_num);
+
+int ql_pwm_disable(unsigned int gpio_num);
+
+int ql_pwm_config_plus(unsigned int gpio_num,QL_PWM_CYCLE_RANGE_E cycle_range,unsigned int high_time,unsigned int cycle_time);

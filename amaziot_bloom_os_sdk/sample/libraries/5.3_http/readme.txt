@@ -1,0 +1,1 @@
+由于最新的sdk为了释放更多的空间，把tls单独放到CSDK_CODE中选择编译，所以SDK原始的http库不支持tls，不能发送https请求，有https应用参照新的demo

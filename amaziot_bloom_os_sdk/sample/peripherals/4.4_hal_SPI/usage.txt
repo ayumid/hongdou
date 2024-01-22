@@ -1,0 +1,101 @@
+
+#include "ql_spi_api.h"
+typedef enum QL_SPI_CLK_ENUM
+{	
+	QL_SPI_CLK_INVALID=-1,
+	QL_SPI_CLK_812_5KHZ=0,
+	QL_SPI_CLK_1_625MHZ,
+	QL_SPI_CLK_3_25MHZ,
+	QL_SPI_CLK_6_5MHZ,
+	QL_SPI_CLK_13MHZ,
+	QL_SPI_CLK_26MHZ,
+	QL_SPI_CLK_52MHZ,
+	QL_SPI_CLK_MAX,
+}QL_SPI_CLK_E;
+
+typedef enum QL_SPI_MODE_ENUM
+{	
+	QL_SPI_MODE_INVALID=-1,
+	QL_SPI_MODE0=0,	//CPOL=0, CPHA=0
+	QL_SPI_MODE1,	//CPOL=0, CPHA=1
+	QL_SPI_MODE2,	//CPOL=1, CPHA=0 
+	QL_SPI_MODE3,	//CPOL=1, CPHA=1
+	QL_SPI_MODE_MAX,
+}QL_SPI_MODE_E;
+
+typedef enum QL_SPI_PORT_ENUM
+{
+	QL_SPI_PORT_INVALID = -1,
+	QL_SPI_PORT0 = 0,	//GPIO16-GPIO19
+	QL_SPI_PORT1 = 1,	//GPIO33-GPIO36
+	QL_SPI_PORT_MAX,
+}QL_SPI_PORT_E;
+
+/*****************************************************************
+* Function: ql_spi_init
+*
+* Description:
+* 	该函数用于初始化 SPI，应在使用 SPI 其他 API 前调用。
+* 
+* Parameters:
+* 	port	  	[in] 	SPI 通道选择。
+* 	spimode	  	[in] 	SPI 模式选择。
+* 	spiclk	  	[in] 	SPI 时钟频率设置。
+* Return:
+* 	0 函数执行成功
+*	-1 函数执行失败
+*
+*****************************************************************/
+int ql_spi_init(QL_SPI_PORT_E port, QL_SPI_MODE_E spimode, QL_SPI_CLK_E spiclk);
+
+/*****************************************************************
+* Function: ql_spi_write_read
+*
+* Description:
+* 	该函数用于通过 SPI 同时发送和接收数据。
+* 
+* Parameters:
+* 	port	  	[in] 	SPI 通道选择。
+* 	inbuf	  	[in] 	SPI 发送数据。
+* 	outbuf	  	[out] 	SPI 接收数据。
+* 	len	  		[in] 	SPI 发送和接收数据的长度。
+* Return:
+* 	0 函数执行成功
+*	-1 函数执行失败
+*
+*****************************************************************/
+int ql_spi_write_read(QL_SPI_PORT_E port, unsigned char *inbuf, unsigned char *outbuf, unsigned int len);
+
+/*****************************************************************
+* Function: ql_spi_write
+*
+* Description:
+* 	该函数用于通过 SPI 发送数据。
+* 
+* Parameters:
+* 	port	  	[in] 	SPI 通道选择。
+* 	inbuf	  	[in] 	SPI 发送数据。
+* 	len	  		[in] 	SPI 发送数据的长度。
+* Return:
+* 	0 函数执行成功
+*	-1 函数执行失败
+*
+*****************************************************************/
+int ql_spi_write(QL_SPI_PORT_E port, unsigned char *buf, unsigned int len);
+
+/*****************************************************************
+* Function: ql_spi_read
+*
+* Description:
+* 	该函数用于通过 SPI 接收数据。
+* 
+* Parameters:
+* 	port	  	[in] 	SPI 通道选择。
+* 	outbuf	  	[out] 	SPI 接收数据。
+* 	len	  		[in] 	SPI 接收数据的长度。
+* Return:
+* 	0 函数执行成功
+*	-1 函数执行失败
+*
+*****************************************************************/
+int ql_spi_read(QL_SPI_PORT_E port, unsigned char *buf, unsigned int len);

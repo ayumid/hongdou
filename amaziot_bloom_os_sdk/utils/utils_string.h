@@ -1,16 +1,16 @@
 //------------------------------------------------------------------------------
-// Copyright , 2017-2021 奇迹物联（北京）科技有限公司
+// Company     : Copyright (c) 2017-2021 奇迹物联（北京）科技有限公司
 // Filename    : utils_string.h
-// Auther      : win
+// Auther      : zhaoning
 // Version     :
-// Date : 2021-12-22
+// Date        : 2021-7-19
 // Description :
 //          
 //          
 // History     :
 //     
-//    1. Time         : 2021-12-22
-//       Modificator  : win
+//    1. Time         : 2021-7-19
+//       Modificator  : zhaoning
 //       Modification : Created
 //    2.
 // Others :
@@ -19,96 +19,40 @@
 #ifndef _UTILS_STRING_H_
 #define _UTILS_STRING_H_
 
-// Includes ---------------------------------------------------------------------
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-// Public defines / typedef -----------------------------------------------------
+// Includes ---------------------------------------------------------------------
+
+#include "sdk_api.h"
+
+// Public macros / types / typedef ----------------------------------------------
+
+#define                 ASCIISTR2HEX_MODE_LITTLE_ENDIAN         0
+#define                 ASCIISTR2HEX_MODE_BIG_ENDIAN            1
+#define                 ASCIISTR2HEX_MODE_LITTLE_ENDIAN_16         2
+#define                 ASCIISTR2HEX_MODE_BIG_ENDIAN_16            3
 
 // Public functions prototypes --------------------------------------------------
-/**
-  * Function    : utils_is_begin_with
-  * Description : 判断字符串开头
-  * Input       : str1 原始字符串
-  *               str2 开头字符串
-  *               
-  * Output      : 
-  * Return      : 
-  * Auther      : win
-  * Others      : 
-  **/
-int utils_is_begin_with(const char * str1,char *str2);
-/**
-  * Function    : utils_is_end_with
-  * Description : 判断字符串结尾
-  * Input       : str1 原始字符串
-  *               str2 结尾字符串
-  *               
-  *               
-  * Output      : 
-  * Return      : 
-  * Auther      : win
-  * Others      : 
-  **/
-int utils_is_end_with(const char *str1, char *str2);
-/**
-  * Function    : utils_itoi
-  * Description : 数字转化为字符串
-  * Input       : str 转化字符串容器
-  *               num 需转化的数字 
-  *               
-  * Output      : 
-  * Return      : 
-  * Auther      : win
-  * Others      : 
-  **/
-void utils_itoi(char *str, unsigned long num);
-/**
-  * Function    : utils_itoc
-  * Description : 单个数字转化为字符
-  * Input       : 需转化的数字
-  *               
-  * Output      : 转化后字符
-  * Return      : 
-  * Auther      : win
-  * Others      : 
-  **/
-char utils_itoc(unsigned char ichar);
-/**
-  * Function    : utils_Hex2Str
-  * Description : 16进制数转化成字符串
-  * Input       : pSrc  源数据指针
-  *               pDst  目标字符串指针
-  *               nSrcLength  转化长度
-  * Output      : 
-  * Return      : 
-  * Auther      : win
-  * Others      : 如：{0xC8, 0x32, 0x9B, 0xFD, 0x0E, 0x01} --> "C8329BFD0E01"
-  **/
-void utils_Hex2Str(char* pSrc, char* pDst, unsigned int nSrcLength);
-/**
-  * Function    : utils_AsciiToHex
-  * Description : ASCALL码转换成字符
-  * Input       : cNum ASC-II字符码
-  *              
-  * Output      : 
-  * Return      : HEX码
-  * Auther      : win
-  * Others      : 如：{'A'} --> 0xA
-  **/
-unsigned char utils_AsciiToHex(unsigned char cNum);
-/**
-  * Function    : utils_StrToHex
-  * Description : 字符串转换hex
-  * Input       : ptr 字符存储区
-  *               len 数据长度
-  * Output      : 
-  * Return      : 
-  * Auther      : win
-  * Others      : 如："C8329BFD0E01" -->  {0xC8, 0x32, 0x9B, 0xFD, 0x0E, 0x01}
-  **/
-void utils_StrToHex(char *ptr, unsigned short len);
 
-#endif /* ifndef _UTILS_STRING_H_.2021-12-22 15:21:58 by: win */
+//void utils_utc_2_localtime(UINT8* p_buffer);
+//int utils_hex2ascii(UINT8 uc_hex);
+//UINT16 utils_hex2ascii_str(char* p_str, UINT8* p_hex, UINT16 ul_len);
+int utils_ascii2hex(UINT8 uc_ascii);
+UINT32 utils_ascii_str2hex(UINT8 mode, char* p_hex, const char* p_str, UINT32 ulLen );
+//void utils_itoa(int n,char s[]);
+//int utils_ftoa(char *str, float num, int n);//n是转换的精度，即是字符串'.'后有几位小数
+//void utils_insert_sort(UINT32 a[], int n);
+//void utils_U_bubble_sort(UINT32 *array, int size);
+//void utils_S_bubble_sort(INT32 *array, int size);
+void utils_nmea_cpy(char* src, char* dest, char* nmea, char* next_nmea);
+//double utils_get_distance_between_A2B(double lata, double lnga, double latb, double lngb);
+//double utils_get_distance_between_A2B_by_haversine(double lata,double loga, double latb,double logb);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* ifndef UTILS_STRING_H_.2021-7-19 9:58:53 by: zhaoning */
 

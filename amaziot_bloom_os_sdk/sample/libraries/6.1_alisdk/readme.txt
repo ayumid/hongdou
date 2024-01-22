@@ -1,0 +1,7 @@
+7341440E67F11A111854AE77F7DC9E64D42B3E0A30DC6517CCA85CA6DCD80AA1.zip 是从阿里云下载的原始sdk，如需更新请下载最新的sdk
+
+1、一机一密的，参照mqtt_basic_demo.c， 修改makefile，编译mqtt_basic_demo.c
+
+2、一型一密的、动态注册，参照dynreg_basic_demo.c获取DeviceSecret， 修改makefile，编译dynreg_basic_demo.c
+
+详见阿里云。

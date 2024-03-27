@@ -1,39 +1,24 @@
 # hongdou
 
 #### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+红豆平台基于AM430EV5模组，硬件接口，软件组件丰富，可以方便开发者使用平台快速开发自己的项目，或者直接使用平台提供的固件生产。
 
 #### 软件架构
-软件架构说明
-
-
-#### 安装教程
-
-1.  xxxx 
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+红豆版本分为两个部分，一部分为固定的库文件，编译器文件，下载文件等。这一部分体积比较大，一般不会修改。因此将这一部分代码放入wiki上。这一部分文件树介绍如下：
+- CSDK_CODE：开源协议栈源代码，在makefile中选择编译。
+- CSDK_LIB：库文件，这一部分代码不开源，包括底层的业务逻辑实现。
+- download：固件打包，下载的工具所在文件夹，工具名称为about。
+- fota_tool：Fota文件生成文件夹。红豆平台只支持最小系统升级
+- include：Code和lib中源文件的一些头文件。
+- out：编译生成的axf、bin、map文件目录，执行build.bat后，会将bin文件拷贝到download相应目录中。
+- prebuilt-xxx：和平台相关的一些文件，Catstudio查看日志需要导入的文件，以及芯片内存分配文件在这里。
+- tools：编译所需要一些工具。
+- 其它：Excle文件包括IO定义等，其它文本都是一些说明性文件，建议在开发之前查看。
+下载地址：https://rckrv97mzx.feishu.cn/drive/folder/UiYAf1xoklW3S7dbY4ScD58CnTs
+gitee部分介绍
+- libraries：库文件，包括奇迹提供的库文件，以及第三方库文件，开源。
+- platform：平台文件，包含涂鸦，阿里云、腾讯云等云平台sdk在这里。
+- products：开源产品文件夹，包括源文件，头文件，makefile等。
+- sample：Demo文件夹，所有的功能实例。
+- utils：工具API所在文件夹。包括字符串操作等。
+下载地址：https://gitee.com/ning./hongdou

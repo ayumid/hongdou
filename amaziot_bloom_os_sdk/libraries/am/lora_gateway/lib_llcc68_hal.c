@@ -425,16 +425,16 @@ void SX1262Hal_SPIWrite( uint8_t Data )
         else
             ClrSX1262MOSI();
         Data <<= 1; 
-        Timer0_Switch(1);
-        DelayInMilliSecond(1);
-        Timer0_Switch(0);
-//        dtu_delay_us(2);
+//        Timer0_Switch(1);
+//        DelayInMilliSecond(1);
+//        Timer0_Switch(0);
+        dtu_delay_us(2);
         
         SetSX1262SCK();
-        Timer0_Switch(1);
-        DelayInMilliSecond(1);
-        Timer0_Switch(0);
-//        dtu_delay_us(2);
+//        Timer0_Switch(1);
+//        DelayInMilliSecond(1);
+//        Timer0_Switch(0);
+        dtu_delay_us(2);
         ClrSX1262SCK();
     }
 //     ClrSX1262SCK();
@@ -458,15 +458,15 @@ uint8_t SX1262Hal_SPIWriteRead( uint8_t dataTX )
         else
             ClrSX1262MOSI();
         dataTX <<= 1;         
-        Timer0_Switch(1);
-        DelayInMilliSecond(1);
-        Timer0_Switch(0);
-//        dtu_delay_us(2);
+//        Timer0_Switch(1);
+//        DelayInMilliSecond(1);
+//        Timer0_Switch(0);
+        dtu_delay_us(2);
         SetSX1262SCK();
-        Timer0_Switch(1);
-        DelayInMilliSecond(1);
-        Timer0_Switch(0);
-//        dtu_delay_us(2);
+//        Timer0_Switch(1);
+//        DelayInMilliSecond(1);
+//        Timer0_Switch(0);
+        dtu_delay_us(2);
         if(SX1262MISO())
             dataRX |= 0x01;
         ClrSX1262SCK();

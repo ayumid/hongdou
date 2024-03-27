@@ -1,0 +1,9 @@
+am-dtu DTU 版本，包括tcp/udp，mqtt版本
+
+am-rtu RTU 版本，RTU 版本，包括tcp/udp，mqtt版本，使用本地+远程AT，以及远程json协议控制，查询，配置 RTU 参数
+
+am-rtu-m-modbus RTU 版本，包括tcp/udp，mqtt版本，使用本地+远程AT，以及远程json协议控制，查询，配置 RTU 参数，本地支持modbus主机
+
+am-rtu-s-modbus RTU 版本，包括tcp/udp，mqtt版本，使用本地+远程AT，以及远程json协议控制，查询，配置 RTU 参数，本地支持modbus从机
+
+http版本

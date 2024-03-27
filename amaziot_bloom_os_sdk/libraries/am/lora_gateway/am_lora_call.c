@@ -28,7 +28,6 @@
 // Private variables ------------------------------------------------------------
 
 static UINT8 dtu_lora_call_task_stack[DTU_LORA_CALL_TASK_STACK_SIZE];
-static OSMsgQRef    dtu_lora_call_msgq = NULL;
 
 static OSTaskRef dtu_lora_call_msgq_task_ref = NULL;
 
@@ -41,6 +40,8 @@ extern DTU_FORM_FILE_PARAM_T st_dtu_form_file_t[256];
 // Private functions prototypes -------------------------------------------------
 
 // Public functions prototypes --------------------------------------------------
+
+extern OSMsgQRef lora_data_msgq;
 
 // Functions --------------------------------------------------------------------
 
@@ -57,7 +58,7 @@ extern DTU_FORM_FILE_PARAM_T st_dtu_form_file_t[256];
 int dtu_lora_call_task_send_msgq(LORA_RCV_DATA_MSG_T * msg)
 {
     int ret = 0;
-    OSA_STATUS status = OSAMsgQSend(dtu_lora_call_msgq, DTU_LORA_CALL_MSGQ_MSG_SIZE, (void*)msg, OSA_NO_SUSPEND);
+    OSA_STATUS status = OSAMsgQSend(lora_data_msgq, DTU_LORA_CALL_MSGQ_MSG_SIZE, (void*)msg, OSA_NO_SUSPEND);
     if (status != OS_SUCCESS)
     {
         uprintf("%s, OSAMsgQSend lose, msg->id=%d, status=%d", __FUNCTION__, msg->len, status);
@@ -218,7 +219,6 @@ static void dtu_lora_call_task(void *ptr)
     int ret = 0;
     int i = 0;
     LORA_RCV_DATA_MSG_T rcv_data = {0};
-    UINT32 dtime = 0;
 
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
     
@@ -234,19 +234,16 @@ static void dtu_lora_call_task(void *ptr)
     while(1)
     {
         //阻塞1s等待从机回复的数据
-        status = OSAMsgQRecv(dtu_lora_call_msgq, (void *)&rcv_data, sizeof(LORA_RCV_DATA_MSG_T), OSA_SUSPEND);
+        status = OSAMsgQRecv(lora_data_msgq, (void *)&rcv_data, sizeof(LORA_RCV_DATA_MSG_T), OSA_SUSPEND);
 
         if(status == OS_SUCCESS)
         {
             if(DTU_LORA_TIMER_INTERVAL_MSG == rcv_data.id)
             {
-                uprintf("%s[%d] timer msg\r\n", __FUNCTION__, __LINE__);
+//                uprintf("%s[%d] timer msg\r\n", __FUNCTION__, __LINE__);
                     //for循环查询列表中哪些指令激活，按照激活指令参数配置 指令
                 for(i = st_dtu_lora.id; i < DTU_LORA_SLAVE_NUM; i++)
                 {
-                    //判断时间是否超时，超时后点名
-                    dtime = utils_utc8_2_day_timestamp();
-                    
                     if(0 != strlen(st_dtu_form_file_t[i].devid))
                     {
                         uprintf("%s[%d] slave id: %s\n", __FUNCTION__, __LINE__, st_dtu_form_file_t[i].devid);
@@ -274,7 +271,7 @@ static void dtu_lora_call_task(void *ptr)
                 {
                     DTU_LORA_DATA_HEAD_T data = {0};
                     data.maddr = 0xFFFF;
-                    data.daddr = st_dtu_lora.id;
+                    data.daddr = st_dtu_lora.id - 1;
                     memcpy(data.devid, st_dtu_form_file_t[i].devid, strlen(st_dtu_form_file_t[i].devid));
                     data.cmd = 1;
                     //发送数据到从机
@@ -282,13 +279,13 @@ static void dtu_lora_call_task(void *ptr)
                     dev_lora_send((UINT8*)&data, sizeof(DTU_LORA_DATA_HEAD_T));
 //                    dev_lora_module_packet_init(strlen("LORA000001"));
 //                    dev_lora_send((UINT8*)"LORA000001", strlen("LORA000001"));
-                    uprintf("%s[%d] send dev:%d", __FUNCTION__, __LINE__, st_dtu_lora.id - 1);
+                    uprintf("%s[%d] send dev:%d", __FUNCTION__, __LINE__, st_dtu_lora.id);
                 }
             }
             else if(DTU_LORA_TIMER_DATA_MSG == rcv_data.id && NULL != rcv_data.data)
             {
                 //从机回复了，上报到服务器
-                uprintf("lora time slave res");
+                uprintf("lora call slave res length: %d, %s", rcv_data.len, rcv_data.data);
                 //modbus rtu帧，直接发
 #ifdef DTU_BASED_ON_TCP
                 dtu_socket_write(rcv_data.data, rcv_data.len);
@@ -333,8 +330,8 @@ void dtu_lora_call_task_init(void)
     OSA_STATUS status = 0;
 
     /*creat message*/
-    status = OSAMsgQCreate(&dtu_lora_call_msgq, "dtu_lora_call_msgq", DTU_LORA_CALL_MSGQ_MSG_SIZE, DTU_LORA_CALL_TASK_MSGQ_QUEUE_SIZE, OS_FIFO);
-    ASSERT(status == OS_SUCCESS);
+//    status = OSAMsgQCreate(&dtu_lora_call_msgq, "dtu_lora_call_msgq", DTU_LORA_CALL_MSGQ_MSG_SIZE, DTU_LORA_CALL_TASK_MSGQ_QUEUE_SIZE, OS_FIFO);
+//    ASSERT(status == OS_SUCCESS);
 
     status = OSATaskCreate(&dtu_lora_call_msgq_task_ref, dtu_lora_call_task_stack, DTU_LORA_CALL_TASK_STACK_SIZE, 151, "dtu_lora_call_task", dtu_lora_call_task, NULL);
     ASSERT(status == OS_SUCCESS);

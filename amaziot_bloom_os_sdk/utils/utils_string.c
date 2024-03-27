@@ -249,7 +249,7 @@ UINT32 utils_ascii_str2hex(UINT8 mode, char* p_hex, const char* p_str, UINT32 ul
 
     return (i);
 }
-#if 0
+#if 1
 /**
   * Function    : reverse
   * Description : 字符串倒序

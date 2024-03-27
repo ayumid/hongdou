@@ -188,7 +188,8 @@ static DTU_DSAT_RESULT_TYPE_E dtu_atcmd_lora_gateway_cfg(char *atName, char *atL
 static DTU_DSAT_RESULT_TYPE_E dtu_at_trans_cmd_func_set_lora_gateway_cfg(DTU_AT_CMD_PARA_T *dtu_atcmd_param,char *atLine,DTU_AT_CMD_RES_T *resp);
 static DTU_DSAT_RESULT_TYPE_E dtu_atcmd_lora_gateway_slave_parsms(char *atName, char *atLine, DTU_AT_CMD_RES_T *resp);
 static DTU_DSAT_RESULT_TYPE_E dtu_at_trans_cmd_func_set_lora_gateway_slave_parsms(DTU_AT_CMD_PARA_T *dtu_atcmd_param,char *atLine,DTU_AT_CMD_RES_T *resp);
-
+static DTU_DSAT_RESULT_TYPE_E dtu_atcmd_lora_gateway_slave_del(char *atName, char *atLine, DTU_AT_CMD_RES_T *resp);
+static DTU_DSAT_RESULT_TYPE_E dtu_at_trans_cmd_func_set_lora_gateway_slave_del(DTU_AT_CMD_PARA_T *dtu_atcmd_param,char *atLine,DTU_AT_CMD_RES_T *resp);
 #endif /* ifdef DTU_TYPE_LORA_INCLUDE.2024-1-15 12:04:58 by: zhaoning */
 static DTU_AT_CMD_TABLE_T dtu_atcmd_table[] = {
 #ifdef DTU_BASED_ON_TCP
@@ -271,6 +272,7 @@ static DTU_AT_CMD_TABLE_T dtu_atcmd_table[] = {
 #ifdef DTU_TYPE_LORA_INCLUDE
     { "+LORACFG",dtu_atcmd_lora_gateway_cfg},
     { "+LORASPARAMS",dtu_atcmd_lora_gateway_slave_parsms},
+    { "+LORADEL",dtu_atcmd_lora_gateway_slave_del}
 #endif /* ifdef DTU_TYPE_LORA_INCLUDE.2024-1-15 12:07:41 by: zhaoning */
 };
 
@@ -6005,7 +6007,7 @@ static DTU_DSAT_RESULT_TYPE_E dtu_at_trans_cmd_func_set_lora_gateway_cfg(DTU_AT_
                 dtu_file_ctx->lora.delay = delay;
                 uprintf("type:%d wait:%d interval:%d delay:%d", type, wait, interval, delay);
             }
-            else if(DTU_LORA_CALL == type)
+            else if(DTU_LORA_TIME == type)
             {
                 uprintf("type:%d", type);
             }
@@ -6080,11 +6082,11 @@ static DTU_DSAT_RESULT_TYPE_E dtu_at_trans_cmd_func_set_lora_gateway_slave_parsm
     //init ruturn error
     DTU_DSAT_RESULT_TYPE_E result = DSAT_ERROR;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
-
+    
     dtu_file_ctx = dtu_get_file_ctx();
     if (AT_CMD_SET == dtu_atcmd_param->iType)
     {
-        if (dtu_atcmd_param->paramCount == 3)
+        if (dtu_atcmd_param->paramCount == 5)
         {
             //第一个参数
             index = at_ParamUintInRange(dtu_atcmd_param->params[0], 1, 65535, &paramRet);
@@ -6092,42 +6094,44 @@ static DTU_DSAT_RESULT_TYPE_E dtu_at_trans_cmd_func_set_lora_gateway_slave_parsm
             {
                 return result;
             }
-            //第二个参数
-            h = at_ParamUintInRange(dtu_atcmd_param->params[1], 0, 23, &paramRet);
-            if (!paramRet)
-            {
-                return result;
-            }
-            //第二个参数
-            m = at_ParamUintInRange(dtu_atcmd_param->params[2], 1, 60, &paramRet);
-            if (!paramRet)
-            {
-                return result;
-            }
-            //第二个参数
-            s = at_ParamUintInRange(dtu_atcmd_param->params[3], 1, 60, &paramRet);
-            if (!paramRet)
-            {
-                return result;
-            }
             //第一个参数，调用字符串解析函数解析
-            devid = (UINT8 *)at_ParamStr(dtu_atcmd_param->params[4], &paramRet);
+            devid = (UINT8 *)at_ParamStr(dtu_atcmd_param->params[1], &paramRet);
             if ((!paramRet)||(strlen((const char*)devid) > DTU_LORA_ID_MAX_LEN))
             {
                 return result;
             }
-            //赋值
-            st_dtu_form_file_t[index].day_timestamp = h * 3600 + m * 60 + s;
-            sprintf(st_dtu_form_file_t[index].devid, (char*)devid); 
+            //第二个参数
+            h = at_ParamUintInRange(dtu_atcmd_param->params[2], 0, 23, &paramRet);
+            if (!paramRet)
+            {
+                return result;
+            }
+            //第二个参数
+            m = at_ParamUintInRange(dtu_atcmd_param->params[3], 1, 60, &paramRet);
+            if (!paramRet)
+            {
+                return result;
+            }
+            //第二个参数
+            s = at_ParamUintInRange(dtu_atcmd_param->params[4], 1, 60, &paramRet);
+            if (!paramRet)
+            {
+                return result;
+            }
             
-            uprintf("index:%d dtime:%ld devid:%s", index, st_dtu_form_file_t[index].day_timestamp, st_dtu_form_file_t[index].devid);
+            //赋值
+            st_dtu_form_file_t[index - 1].day_timestamp = h * 3600 + m * 60 + s;
+            sprintf(st_dtu_form_file_t[index - 1].devid, (char*)devid); 
+            
+            uprintf("index:%d dtime:%ld devid:%s", index, st_dtu_form_file_t[index - 1].day_timestamp, st_dtu_form_file_t[index - 1].devid);
             
             //参数保存文件
-            if(dtu_trans_conf_file_write(dtu_file_ctx) == 0)
+            if(dtu_trans_conf_file_write(dtu_file_ctx) == 0 && dtu_form_conf_file_write(st_dtu_form_file_t) == 0)
             {
                 snprintf(resp->response, DTU_CMD_LINE_RES_MAX_LINE_SIZE, "AT%s", atLine);
                 result = DSAT_OK;
             }
+            
         }
         else if(dtu_atcmd_param->paramCount == 1)
         {
@@ -6137,7 +6141,80 @@ static DTU_DSAT_RESULT_TYPE_E dtu_at_trans_cmd_func_set_lora_gateway_slave_parsm
             {
                 return result;
             }
-            snprintf(resp->response, DTU_CMD_LINE_RES_MAX_LINE_SIZE, "+LORASPARAMS:%d,%ld,%s", index, st_dtu_form_file_t[index].day_timestamp, st_dtu_form_file_t[index].devid);
+            snprintf(resp->response, DTU_CMD_LINE_RES_MAX_LINE_SIZE, "+LORASPARAMS:%d,%ld,%s", index, st_dtu_form_file_t[index - 1].day_timestamp, st_dtu_form_file_t[index - 1].devid);
+            result = DSAT_OK;
+        }
+    }
+    
+    return result;
+}
+
+/**
+  * Function    : dtu_atcmd_lora_gateway_slave_del
+  * Description : 
+  * Input       : 
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+static DTU_DSAT_RESULT_TYPE_E dtu_atcmd_lora_gateway_slave_del(char *atName, char *atLine, DTU_AT_CMD_RES_T *resp)
+{
+    DTU_DSAT_RESULT_TYPE_E result = DSAT_ERROR;
+    DTU_AT_CMD_PARA_T dtu_atcmd_param = {0};
+
+    //判断AT指令是否正确
+    if(dtu_package_at_cmd(atName, atLine, &dtu_atcmd_param) == 0)
+    {
+        //调用对应的AT指令处理函数
+        result = dtu_at_trans_cmd_func_set_lora_gateway_slave_del(&dtu_atcmd_param, atLine, resp);
+        //释放AT指令资源
+        dtu_free_param(&dtu_atcmd_param);
+    }
+    else
+    {
+        //释放AT指令资源
+        dtu_free_param(&dtu_atcmd_param);
+    }
+    
+    return result;
+}
+
+/**
+  * Function    : dtu_at_trans_cmd_func_set_lora_gateway_slave_del
+  * Description : 删除
+  * Input       : 
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+static DTU_DSAT_RESULT_TYPE_E dtu_at_trans_cmd_func_set_lora_gateway_slave_del(DTU_AT_CMD_PARA_T *dtu_atcmd_param,char *atLine,DTU_AT_CMD_RES_T *resp)
+{
+    UINT16 index = 0;//
+
+    bool paramRet = TRUE;
+    //init ruturn error
+    DTU_DSAT_RESULT_TYPE_E result = DSAT_ERROR;
+    DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
+    
+    dtu_file_ctx = dtu_get_file_ctx();
+    if (AT_CMD_SET == dtu_atcmd_param->iType)
+    {
+        if(dtu_atcmd_param->paramCount == 1)
+        {
+            //第一个参数
+            index = at_ParamUintInRange(dtu_atcmd_param->params[0], 1, 65535, &paramRet);
+            if (!paramRet)
+            {
+                return result;
+            }
+            //删除参数
+            memset(st_dtu_form_file_t[index - 1].devid, 0, DTU_LORA_ID_MAX_LEN); 
+            
+            snprintf(resp->response, DTU_CMD_LINE_RES_MAX_LINE_SIZE, "+LORADEL:%d", index);
             result = DSAT_OK;
         }
     }

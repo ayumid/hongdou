@@ -91,6 +91,7 @@ void dtu_form_conf_file_init(void)
     if (fd)
     {
         dtu_form_conf_file_read(fd);
+        //uprintf("%s[%d] file exist, %ld, %s", __FUNCTION__, __LINE__, st_dtu_form_file_t[0].day_timestamp, st_dtu_form_file_t[0].devid);
     }
     //如果文件不存在，就创建文件，初始化文件
     else

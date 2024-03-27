@@ -28,7 +28,6 @@
 // Private variables ------------------------------------------------------------
 
 static UINT8 dtu_lora_time_task_stack[DTU_LORA_TIME_TASK_STACK_SIZE];
-static OSMsgQRef    dtu_lora_time_msgq = NULL;
 
 static OSTaskRef dtu_lora_time_msgq_task_ref = NULL;
 
@@ -41,6 +40,8 @@ extern DTU_FORM_FILE_PARAM_T st_dtu_form_file_t[256];
 // Private functions prototypes -------------------------------------------------
 
 // Public functions prototypes --------------------------------------------------
+
+extern OSMsgQRef lora_data_msgq;
 
 // Functions --------------------------------------------------------------------
 
@@ -70,7 +71,7 @@ static void dtu_lora_time_task(void *ptr)
     while(1)
     {
         //阻塞1s等待从机回复的数据
-        status = OSAMsgQRecv(dtu_lora_time_msgq, (void *)&rcv_data, sizeof(LORA_RCV_DATA_MSG_T), OSA_SUSPEND);
+        status = OSAMsgQRecv(lora_data_msgq, (void *)&rcv_data, sizeof(LORA_RCV_DATA_MSG_T), OSA_SUSPEND);
 
         if(status == OS_SUCCESS)
         {
@@ -85,25 +86,27 @@ static void dtu_lora_time_task(void *ptr)
                     DTU_LORA_RES_DATA_HEAD_T data = {0};
 
                     pst = (DTU_LORA_DATA_HEAD_T*)rcv_data.data;
+                    uprintf("lg: 0x%X id: %d devid: %s cmd: %d\n", pst->maddr, pst->daddr, pst->devid, pst->cmd);
                     //判断消息ID,如果不是发送给主机的，跳出
                     if(0xFFFF != pst->maddr)
                     {
                         break;
                     }
-                    
+                    uprintf("stroedevid: %s", st_dtu_form_file_t[pst->daddr - 1].devid);
                     //判断消息ID后面是否是从机ID，ID前缀是否和设置一样
-                    if(0 != strncmp(st_dtu_form_file_t[pst->daddr].devid, pst->devid, 4))
+                    if(0 != strncmp(st_dtu_form_file_t[pst->daddr - 1].devid, pst->devid, DTU_LORA_ID_MAX_LEN))
                     {
                         break;
                     }
+                    
                     if(DTU_LORA_CMD1 == pst->cmd)
                     {
                         data.maddr = 0xFFFF;
                         data.daddr = st_dtu_lora.id;
-                        data.timetsamp = st_dtu_form_file_t[pst->daddr].day_timestamp;
+                        data.timetsamp = st_dtu_form_file_t[pst->daddr - 1].day_timestamp;
                         //发送数据到从机
                         dev_lora_module_packet_init(sizeof(DTU_LORA_RES_DATA_HEAD_T));
-                        dev_lora_send(data, sizeof(DTU_LORA_RES_DATA_HEAD_T)));
+                        dev_lora_send((void*)&data, sizeof(DTU_LORA_RES_DATA_HEAD_T));
                     }
                     else if(DTU_LORA_CMD2 == pst->cmd)
                     {
@@ -149,10 +152,6 @@ static void dtu_lora_time_task(void *ptr)
 void dtu_lora_time_task_init(void)
 {
     OSA_STATUS status = 0;
-
-    /*creat message*/
-    status = OSAMsgQCreate(&dtu_lora_time_msgq, "dtu_lora_time_msgq", DTU_LORA_TIME_MSGQ_MSG_SIZE, DTU_LORA_TIME_TASK_MSGQ_QUEUE_SIZE, OS_FIFO);
-    ASSERT(status == OS_SUCCESS);
 
     status = OSATaskCreate(&dtu_lora_time_msgq_task_ref, dtu_lora_time_task_stack, DTU_LORA_TIME_TASK_STACK_SIZE, 151, "dtu_lora_time_task", dtu_lora_time_task, NULL);
     ASSERT(status == OS_SUCCESS);

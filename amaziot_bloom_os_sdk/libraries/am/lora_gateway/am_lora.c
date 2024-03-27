@@ -26,18 +26,12 @@
 
 #define LORA_TASK_STACK_SIZE     1024 * 8
 
-typedef struct _LORA_DATA_MSG_S
-{
-    UINT32 len;//消息长度
-    UINT8* data;
-}LORA_DATA_MSG_T, *P_LORA_DATA_MSG_T;
-
 typedef struct _LORA_INT_MSG_S
 {
     UINT8 id;//消息长度
 }LORA_INT_MSG_T, *P_LORA_INT_MSG_T;
 
-#define DTU_LORA_TASK_MSGQ_MSG_SIZE              (sizeof(LORA_DATA_MSG_T))
+#define DTU_LORA_TASK_MSGQ_MSG_SIZE              (sizeof(LORA_RCV_DATA_MSG_T))
 #define DTU_LORA_TASK_MSGQ_QUEUE_SIZE            (50)
 
 #define DTU_LORA_INT_TASK_MSGQ_MSG_SIZE              (sizeof(LORA_INT_MSG_T))
@@ -57,11 +51,11 @@ typedef enum
     DIO1_STATE_SEND,
 }DEV_SLAVE_DIO1_STATE;
 
-typedef struct _DEV_SLAVE_S
-{
-    DEV_SLAVE_DIO1_STATE state;
-    
-}DEV_LORA_T;
+//typedef struct _DEV_SLAVE_S
+//{
+//    DEV_SLAVE_DIO1_STATE state;
+//    
+//}DEV_LORA_T;
 
 // Private variables ------------------------------------------------------------
 
@@ -71,7 +65,7 @@ OSATimerRef dio1_gpio_detect_timer_ref = NULL;
 OSATaskRef     dio1_gpio_detect_task_ref = NULL;
 char         dio1_gpio_detect_stack_ptr[LORA_TASK_STACK_SIZE] = {0};
 
-DEV_LORA_T dev_lora_state;
+//DEV_LORA_T dev_lora_state;
 
 // Public variables -------------------------------------------------------------
 
@@ -158,6 +152,7 @@ int dev_lora_data_rcv(UINT8* data)
 //    SX1262_ClearIrqStatus(IRQ_RADIO_ALL);
     memset(data, 0, DEV_MASTER_CHIP_LEN);
     SX1262_GetPayload(data, &lora_rx_len, DEV_MASTER_CHIP_LEN);
+//    uprintf("recv len:%d", lora_rx_len);
 //    dev_slave_hex_printf(arr, DEV_SLAVE_PLAIN_LEN);
 //    uprintf("len: %d, %s", lora_rx_len, data);
 //    SX1262_SetRxBoosted(0x0);
@@ -178,7 +173,7 @@ int dev_lora_data_rcv(UINT8* data)
   **/
 void dev_lora_send(UINT8* data, UINT8 len)
 {
-    dev_lora_state.state = DIO1_STATE_SEND;
+//    dev_lora_state.state = DIO1_STATE_SEND;
     SX1262_SendPayload(data, len, 2000);
     
 }
@@ -195,8 +190,13 @@ void dio1_gpio_detect_timer_handler(UINT32 arg)
 //    status = OSAFlagSet(dio1_gpio_detect_flg_ref, 0x01, OSA_FLAG_OR);
 //    ASSERT(os_status==OS_SUCCESS);    
     LORA_INT_MSG_T sdata = {0};
-
-    status = OSAMsgQSend(lora_int_msgq, DTU_LORA_TASK_MSGQ_MSG_SIZE, (void*)&sdata, OSA_NO_SUSPEND);
+    UINT16 irqRegs = 0;
+    
+    irqRegs = SX1262_GetIrqStatus( );
+//    SX1262_ClearIrqStatus( IRQ_RADIO_ALL );
+//    uprintf("irq:0x%02X", irqRegs);
+    sdata.id = irqRegs;
+    status = OSAMsgQSend(lora_int_msgq, DTU_LORA_INT_TASK_MSGQ_MSG_SIZE, (void*)&sdata, OSA_NO_SUSPEND);
 }
 
 void dio1_gpio_detect_handler(void)
@@ -217,27 +217,40 @@ void dio1_gpio_detect_task_entry(void *param)
     UINT32 value = 0;
     OSA_STATUS status = OS_SUCCESS;
     UINT32 flag_value = 0;
-    LORA_DATA_MSG_T send_data = {0};
+    LORA_RCV_DATA_MSG_T send_data = {0};
     LORA_INT_MSG_T rdata = {0};
     UINT8* ldata = NULL;
     unsigned char lora_data[DEV_MASTER_CHIP_LEN] = {0};
-    uint8_t lora_rx_len = 0;
-
+    UINT8 lora_rx_len = 0;
+    UINT16 irqRegs = 0;
+//    int jj = 0;
     while(1)
     {
 //        status = OSAFlagWait(dio1_gpio_detect_flg_ref, 0x01, OSA_FLAG_OR_CLEAR, &flag_value, OSA_SUSPEND);
         status = OSAMsgQRecv(lora_int_msgq, (void *)&rdata, sizeof(LORA_INT_MSG_T), OSA_SUSPEND);
 //        uprintf("dio1_gpio_detect_task_entry\r\n");
         //接收数据
-        lora_rx_len = dev_lora_data_rcv(lora_data);
-        //接收数据是0，表示当次是发送数据产生的中断
+        
+        if(22 == rdata.id)
+        {
+            lora_rx_len = dev_lora_data_rcv(lora_data);
+        }
+//        uprintf("rx len:%d", lora_rx_len);
+        SX1262_ClearIrqStatus( IRQ_RADIO_ALL );
+        //接收数据
         if(0 != lora_rx_len)
         {
-            uprintf("length: %d, %s", lora_rx_len, lora_data);
-            ldata = malloc(lora_rx_len);
+//            for(jj = 0; jj < lora_rx_len; jj++)
+//            {
+//                uprintf("%X", lora_data[jj]);
+//            }
+//            uprintf("length: %d, %s", lora_rx_len, lora_data);
+            ldata = malloc(lora_rx_len + 1);
             if(NULL != ldata)
             {
+                memset(ldata, 0, lora_rx_len + 1);
                 memcpy(ldata, lora_data, lora_rx_len);
+                send_data.id = DTU_LORA_TIMER_DATA_MSG;
                 send_data.len = lora_rx_len;
                 send_data.data = ldata;
                 //发送消息给json主任务
@@ -247,10 +260,12 @@ void dio1_gpio_detect_task_entry(void *param)
                     uprintf("%s, err", __FUNCTION__);
                 }
             }
+            lora_rx_len = 0;
+            memset(lora_data, 0, DEV_MASTER_CHIP_LEN);
         }
         //设置为接收状态
         SX1262_SetStandby(STDBY_XOSC);
-        SX1262_ClearIrqStatus(IRQ_RADIO_ALL);
+//        SX1262_ClearIrqStatus(IRQ_RADIO_ALL);
         SX1262_SetRxBoosted(0x0);
         SX1262_SetRx(0x0);
     }

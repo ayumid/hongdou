@@ -108,6 +108,7 @@ static void dtu_sys_json_get_sys_config_res(void)
 {
     cJSON *gdocr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
@@ -129,25 +130,30 @@ static void dtu_sys_json_get_sys_config_res(void)
     cJSON_AddItemToObject(gdocr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdocr)));
-    if(NULL != send)
+    out = cJSON_Print(gdocr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdocr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
-        //发送数据到服务器
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
+
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:51:31 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-        
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdocr);
+    gdocr = NULL;
 }
 
 /**
@@ -224,6 +230,9 @@ void dtu_sys_json_set_sys_config(int len , char *rcvdata)
                 dtu_hb_timer_stop();
             }
         }
+        //删除json对象
+        cJSON_Delete(gdocg);
+        gdocg = NULL;
     }
 
     p_smsg.status = res;
@@ -244,6 +253,7 @@ void dtu_sys_json_set_sys_config(int len , char *rcvdata)
 static void dtu_sys_json_set_sys_config_res(UINT8 res)
 {
     cJSON *gdocr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -254,26 +264,30 @@ static void dtu_sys_json_set_sys_config_res(UINT8 res)
     cJSON_AddItemToObject(gdocr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdocr)));
-    if(NULL != send)
+    out = cJSON_Print(gdocr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdocr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:52:01 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdocr);
+    gdocr = NULL;
 }
 
 #ifdef DTU_BASED_ON_TCP
@@ -312,6 +326,7 @@ static void dtu_net_json_get_net_config_res(void)
 {
     cJSON *gdocr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
@@ -331,26 +346,30 @@ static void dtu_net_json_get_net_config_res(void)
     cJSON_AddItemToObject(gdocr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdocr)));
-    if(NULL != send)
+    out = cJSON_Print(gdocr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdocr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
+            dtu_socket_write(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdocr);
+    gdocr = NULL;
 }
 
 /**
@@ -411,6 +430,9 @@ void dtu_net_json_set_net_config(int len , char *rcvdata)
                         dtu_file_ctx->socket.type);
             }
         }
+        //删除json对象
+        cJSON_Delete(gdocg);
+        gdocg = NULL;
     }
 
     p_smsg.status = res;
@@ -431,6 +453,7 @@ void dtu_net_json_set_net_config(int len , char *rcvdata)
 static void dtu_net_json_set_net_config_res(UINT8 res)
 {
     cJSON *gdocr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -441,26 +464,30 @@ static void dtu_net_json_set_net_config_res(UINT8 res)
     cJSON_AddItemToObject(gdocr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdocr)));
-    if(NULL != send)
+    out = cJSON_Print(gdocr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdocr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
+            dtu_socket_write(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdocr);
+    gdocr = NULL;
 }
 #endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:49:15 by: zhaoning */
 
@@ -500,6 +527,7 @@ static void dtu_net_json_get_mqtt_config_res(void)
 {
     cJSON *gdocr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
@@ -532,21 +560,30 @@ static void dtu_net_json_get_mqtt_config_res(void)
     cJSON_AddItemToObject(gdocr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdocr)));
-    if(NULL != send)
+    out = cJSON_Print(gdocr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdocr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
-        dtu_mqtt_send(send, strlen(send));
-
-        free(send);
+            //发送数据到服务器
+#ifdef DTU_BASED_ON_TCP
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
+#ifdef DTU_BASED_ON_MQTT
+            dtu_mqtt_send(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdocr);
+    gdocr = NULL;
 }
 
 /**
@@ -636,6 +673,9 @@ void dtu_net_json_set_mqtt_config(int len , char *rcvdata)
                     dtu_file_ctx->mqtt.port,
                     dtu_file_ctx->mqtt.clientid);
         }
+        //删除json对象
+        cJSON_Delete(gdocg);
+        gdocg = NULL;
     }
     p_smsg.status = res;
     
@@ -655,6 +695,7 @@ void dtu_net_json_set_mqtt_config(int len , char *rcvdata)
 static void dtu_net_json_set_mqtt_config_res(UINT8 res)
 {
     cJSON *gdocr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -665,21 +706,30 @@ static void dtu_net_json_set_mqtt_config_res(UINT8 res)
     cJSON_AddItemToObject(gdocr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdocr)));
-    if(NULL != send)
+    out = cJSON_Print(gdocr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdocr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
-        dtu_mqtt_send(send, strlen(send));
-
-        free(send);
+            //发送数据到服务器
+#ifdef DTU_BASED_ON_TCP
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
+#ifdef DTU_BASED_ON_MQTT
+            dtu_mqtt_send(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdocr);
+    gdocr = NULL;
 }
 
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 15:14:28 by: zhaoning */
@@ -720,6 +770,7 @@ static void dtu_di_json_get_di_value_res(void)
 {
     cJSON *gdivr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -737,26 +788,30 @@ static void dtu_di_json_get_di_value_res(void)
     cJSON_AddItemToObject(gdivr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdivr)));
-    if(NULL != send)
+    out = cJSON_Print(gdivr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdivr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:57:24 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdivr);
+    gdivr = NULL;
 }
 
 /**
@@ -794,6 +849,7 @@ static void dtu_di_json_get_di_config_res(void)
 {
     cJSON *gdicr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
 
@@ -825,26 +881,30 @@ static void dtu_di_json_get_di_config_res(void)
     cJSON_AddItemToObject(gdicr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdicr)));
-    if(NULL != send)
+    out = cJSON_Print(gdicr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdicr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:57:36 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdicr);
+    gdicr = NULL;
 }
 
 /**
@@ -934,6 +994,9 @@ void dtu_di_json_set_di_config(int len , char *rcvdata)
                     dtu_file_ctx->di.params[index - 1].interval, 
                     dtu_file_ctx->di.params[index - 1].edge);
         }
+        //删除json对象
+        cJSON_Delete(gdicg);
+        gdicg = NULL;
     }
 
     p_smsg.status = res;
@@ -954,6 +1017,7 @@ void dtu_di_json_set_di_config(int len , char *rcvdata)
 static void dtu_di_json_set_di_config_res(UINT8 res)
 {
     cJSON *gdivr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -964,26 +1028,30 @@ static void dtu_di_json_set_di_config_res(UINT8 res)
     cJSON_AddItemToObject(gdivr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdivr)));
-    if(NULL != send)
+    out = cJSON_Print(gdivr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdivr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:57:51 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdivr);
+    gdivr = NULL;
 }
 
 /**
@@ -1000,6 +1068,7 @@ static void dtu_di_json_res(UINT8 type, UINT8 channel, UINT8 level)
 {
     cJSON *gdivr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
 #ifdef DTU_BASED_ON_TCP
     DTU_SOCKET_PARAM_T* socket_ctx = NULL;
@@ -1045,23 +1114,30 @@ static void dtu_di_json_res(UINT8 type, UINT8 channel, UINT8 level)
     cJSON_AddItemToObject(gdivr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdivr)));
-    if(NULL != send)
+    out = cJSON_Print(gdivr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdivr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:58:03 by: zhaoning */
-
-        free(send);
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
+#ifdef DTU_BASED_ON_MQTT
+            dtu_mqtt_send(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdivr);
+    gdivr = NULL;
 }
 
 /**
@@ -1099,6 +1175,7 @@ static void dtu_do_json_get_do_value_res(void)
 {
     cJSON *gdovr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -1116,26 +1193,30 @@ static void dtu_do_json_get_do_value_res(void)
     cJSON_AddItemToObject(gdovr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdovr)));
-    if(NULL != send)
+    out = cJSON_Print(gdovr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdovr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:58:23 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdovr);
+    gdovr = NULL;
 }
 
 /**
@@ -1226,6 +1307,9 @@ void dtu_do_json_set_do_value(int len , char *rcvdata)
                 }
             }
         }
+        //删除json对象
+        cJSON_Delete(gdov);
+        gdov = NULL;
     }
 
     p_smsg.status = res;
@@ -1246,6 +1330,7 @@ void dtu_do_json_set_do_value(int len , char *rcvdata)
 static void dtu_do_json_set_do_value_res(UINT8 res)
 {
     cJSON *gdovr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -1256,26 +1341,30 @@ static void dtu_do_json_set_do_value_res(UINT8 res)
     cJSON_AddItemToObject(gdovr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdovr)));
-    if(NULL != send)
+    out = cJSON_Print(gdovr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdovr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:58:38 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdovr);
+    gdovr = NULL;
 }
 
 /**
@@ -1313,6 +1402,7 @@ static void dtu_do_json_get_do_config_res(void)
 {
     cJSON *gdocr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
 
@@ -1354,26 +1444,30 @@ static void dtu_do_json_get_do_config_res(void)
     cJSON_AddItemToObject(gdocr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdocr)));
-    if(NULL != send)
+    out = cJSON_Print(gdocr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdocr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:58:47 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdocr);
+    gdocr = NULL;
 }
 
 /**
@@ -1465,6 +1559,9 @@ void dtu_do_json_set_do_config(int len , char *rcvdata)
 //                    dtu_file_ctx->doo.do1.do_time,
 //                    dtu_file_ctx->doo.do1.do_flip);
         }
+        //删除json对象
+        cJSON_Delete(gdocg);
+        gdocg = NULL;
     }
 
     p_smsg.status = res;
@@ -1485,6 +1582,7 @@ void dtu_do_json_set_do_config(int len , char *rcvdata)
 static void dtu_do_json_set_do_config_res(UINT8 res)
 {
     cJSON *gdocr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -1495,26 +1593,30 @@ static void dtu_do_json_set_do_config_res(UINT8 res)
     cJSON_AddItemToObject(gdocr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdocr)));
-    if(NULL != send)
+    out = cJSON_Print(gdocr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdocr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:59:04 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdocr);
+    gdocr = NULL;
 }
 
 /**
@@ -1531,6 +1633,7 @@ static void dtu_do_json_res(UINT8 channel, UINT8 level)
 {
     cJSON *gdor = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -1563,26 +1666,30 @@ static void dtu_do_json_res(UINT8 channel, UINT8 level)
     cJSON_AddItemToObject(gdor, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gdor)));
-    if(NULL != send)
+    out = cJSON_Print(gdor);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gdor);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:59:15 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gdor);
+    gdor = NULL;
 }
 
 /**
@@ -1620,6 +1727,7 @@ static void dtu_ai_json_get_ai_value_res(void)
 {
     cJSON *gaivr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     UINT16 ai_v = 0;
     float ai_i = 0.0;
@@ -1638,26 +1746,30 @@ static void dtu_ai_json_get_ai_value_res(void)
     cJSON_AddItemToObject(gaivr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gaivr)));
-    if(NULL != send)
+    out = cJSON_Print(gaivr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gaivr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:59:25 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gaivr);
+    gaivr = NULL;
 }
 
 /**
@@ -1695,6 +1807,7 @@ static void dtu_ai_json_get_ai_config_res(void)
 {
     cJSON *gaicr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
 
@@ -1716,26 +1829,30 @@ static void dtu_ai_json_get_ai_config_res(void)
     cJSON_AddItemToObject(gaicr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gaicr)));
-    if(NULL != send)
+    out = cJSON_Print(gaicr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gaicr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:59:37 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gaicr);
+    gaicr = NULL;
 }
 
 /**
@@ -1830,6 +1947,9 @@ void dtu_ai_json_set_ai_config(int len , char *rcvdata)
                         dtu_file_ctx->ai.ai_alarm_high);
             }
         }
+        //删除json对象
+        cJSON_Delete(gaicg);
+        gaicg = NULL;
     }
 
     p_smsg.status = res;
@@ -1850,6 +1970,7 @@ void dtu_ai_json_set_ai_config(int len , char *rcvdata)
 static void dtu_ai_json_set_ai_config_res(UINT8 res)
 {
     cJSON *gaivr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -1860,26 +1981,30 @@ static void dtu_ai_json_set_ai_config_res(UINT8 res)
     cJSON_AddItemToObject(gaivr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gaivr)));
-    if(NULL != send)
+    out = cJSON_Print(gaivr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gaivr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:59:57 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gaivr);
+    gaivr = NULL;
 }
 
 /**
@@ -1938,6 +2063,7 @@ static void dtu_ai_json_res(void)
 {
     cJSON *gaivr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     UINT16 ai_v = 0;
     float ai_i = 0.0;
@@ -2003,28 +2129,31 @@ static void dtu_ai_json_res(void)
         cJSON_AddItemToObject(gaivr, "data", data);
 
         //申请内存
-        send = malloc(strlen(cJSON_Print(gaivr)));
-        if(NULL != send)
+        out = cJSON_Print(gaivr);
+        if(NULL != out)
         {
-            memset(send, 0, strlen(send));
-            send = cJSON_PrintUnformatted(gaivr);  // 生成不带空格的JSON字符串
-            
-//            uprintf("send:%s",send);
+            send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+            if(NULL != send)
+            {
+                uprintf("send:%s",send);
 
-            //发送数据到服务器
+                //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-            dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 18:00:07 by: zhaoning */
+                dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-            dtu_mqtt_send(send, strlen(send));
+                dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-            free(send);
+                cJSON_free(send);
+                send = NULL;
+            }
+            cJSON_free(out);
+            out = NULL;
         }
     }while(0);
-
     //删除json对象
     cJSON_Delete(gaivr);
+    gaivr = NULL;
 }
 
 /**
@@ -2062,6 +2191,7 @@ static void dtu_flow_json_get_flow_config_res(void)
 {
     cJSON *gfcr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
 
@@ -2083,26 +2213,30 @@ static void dtu_flow_json_get_flow_config_res(void)
     cJSON_AddItemToObject(gfcr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gfcr)));
-    if(NULL != send)
+    out = cJSON_Print(gfcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gfcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 18:00:21 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gfcr);
+    gfcr = NULL;
 }
 
 /**
@@ -2160,6 +2294,9 @@ void dtu_flow_json_set_flow_config(int len , char *rcvdata)
                 }
             }
         }
+        //删除json对象
+        cJSON_Delete(sfcg);
+        sfcg = NULL;
     }
 
     p_smsg.status = res;
@@ -2180,6 +2317,7 @@ void dtu_flow_json_set_flow_config(int len , char *rcvdata)
 static void dtu_flow_json_set_flow_config_res(UINT8 res)
 {
     cJSON *gfcr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -2190,26 +2328,30 @@ static void dtu_flow_json_set_flow_config_res(UINT8 res)
     cJSON_AddItemToObject(gfcr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gfcr)));
-    if(NULL != send)
+    out = cJSON_Print(gfcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gfcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 18:00:39 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gfcr);
+    gfcr = NULL;
 }
 
 /**
@@ -2247,6 +2389,7 @@ static void dtu_clk_json_get_clk_config_res(void)
 {
     cJSON *gclkcr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
 
@@ -2293,26 +2436,30 @@ static void dtu_clk_json_get_clk_config_res(void)
     cJSON_AddItemToObject(gclkcr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gclkcr)));
-    if(NULL != send)
+    out = cJSON_Print(gclkcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gclkcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 18:00:53 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gclkcr);
+    gclkcr = NULL;
 }
 
 /**
@@ -2451,6 +2598,9 @@ void dtu_clk_json_set_clk_config(int len , char *rcvdata)
                 }
             }
         }
+        //删除json对象
+        cJSON_Delete(gclkcg;
+        gclkcg = NULL;
     }
 
     p_smsg.status = res;
@@ -2471,6 +2621,7 @@ void dtu_clk_json_set_clk_config(int len , char *rcvdata)
 static void dtu_clk_json_set_clk_config_res(UINT8 res)
 {
     cJSON *gclkcr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -2481,26 +2632,30 @@ static void dtu_clk_json_set_clk_config_res(UINT8 res)
     cJSON_AddItemToObject(gclkcr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gclkcr)));
-    if(NULL != send)
+    out = cJSON_Print(gclkcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gclkcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:53:10 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gclkcr);
+    gclkcr = NULL;
 }
 #endif /* ifdef DTU_TYPE_DODIAI_INCLUDE.2023-10-27 11:36:55 by: zhaoning */
 
@@ -2519,6 +2674,7 @@ static void dtu_fota_result_json_cbk(UINT32 result)
 //    uprintf("%s: result = %ld",__FUNCTION__, result);
     int res = 0;
     cJSON *gota = NULL;
+    char* out = NULL;
     char* send = NULL;
         
     if(result != FOTA_SUCCESS)
@@ -2535,26 +2691,30 @@ static void dtu_fota_result_json_cbk(UINT32 result)
     cJSON_AddItemToObject(gota, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gota)));
-    if(NULL != send)
+    out = cJSON_Print(gota);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gota);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:53:38 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gota);
+    gota = NULL;
     
     if(result == FOTA_SUCCESS)
     {
@@ -2671,6 +2831,7 @@ static void dtu_modbus_json_get_modbus_config_res(void)
 {
     cJSON *gmbcr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
 
@@ -2691,27 +2852,30 @@ static void dtu_modbus_json_get_modbus_config_res(void)
     cJSON_AddItemToObject(gmbcr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gmbcr)));
-    if(NULL != send)
+    out = cJSON_Print(gmbcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gmbcr);  // 生成不带空格的JSON字符串
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-//        uprintf("send:%s",send);
-
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:54:27 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        //释放内存
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gmbcr);
+    gmbcr = NULL;
 }
 
 /**
@@ -2801,6 +2965,9 @@ void dtu_modbus_json_set_modbus_config(int len , char *rcvdata)
                     dtu_file_ctx->modbus.config.interval,
                     dtu_file_ctx->modbus.config.delay);
         }
+        //删除json对象
+        cJSON_Delete(smbcr);
+        smbcr = NULL;
     }
 
     p_smsg.status = res;
@@ -2821,6 +2988,7 @@ void dtu_modbus_json_set_modbus_config(int len , char *rcvdata)
 static void dtu_modbus_json_set_modbus_config_res(UINT8 res)
 {
     cJSON *smbcr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -2831,27 +2999,30 @@ static void dtu_modbus_json_set_modbus_config_res(UINT8 res)
     cJSON_AddItemToObject(smbcr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(smbcr)));
-    if(NULL != send)
+    out = cJSON_Print(smbcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(smbcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:54:38 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        //释放内存
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(smbcr);
+    smbcr = NULL;
 }
 
 /**
@@ -2889,6 +3060,7 @@ static void dtu_modbus_json_get_modbus_cmd_res(UINT8 id)
 {
     cJSON *gmbcr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
 
@@ -2910,27 +3082,30 @@ static void dtu_modbus_json_get_modbus_cmd_res(UINT8 id)
     cJSON_AddItemToObject(gmbcr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gmbcr)));
-    if(NULL != send)
+    out = cJSON_Print(gmbcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gmbcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:54:52 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        //释放内存
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gmbcr);
+    gmbcr = NULL;
 }
 
 /**
@@ -2968,6 +3143,7 @@ static void dtu_modbus_json_get_modbus_cmdwn_res(UINT8 id)
 {
     cJSON *gmbcr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
 
@@ -2990,27 +3166,30 @@ static void dtu_modbus_json_get_modbus_cmdwn_res(UINT8 id)
     cJSON_AddItemToObject(gmbcr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gmbcr)));
-    if(NULL != send)
+    out = cJSON_Print(gmbcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gmbcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:55:10 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        //释放内存
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gmbcr);
+    gmbcr = NULL;
 }
 
 /**
@@ -3098,6 +3277,9 @@ void dtu_modbus_json_set_modbus_cmd(int len , char *rcvdata)
                             dtu_file_ctx->modbus.cmd[index].reg_n_d);
             }
         }
+        //删除json对象
+        cJSON_Delete(smbc);
+        smbc = NULL;
     }
 
     p_smsg.status = res;
@@ -3118,6 +3300,7 @@ void dtu_modbus_json_set_modbus_cmd(int len , char *rcvdata)
 static void dtu_modbus_json_set_modbus_cmd_res(UINT8 res)
 {
     cJSON *smbcr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -3128,27 +3311,30 @@ static void dtu_modbus_json_set_modbus_cmd_res(UINT8 res)
     cJSON_AddItemToObject(smbcr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(smbcr)));
-    if(NULL != send)
+    out = cJSON_Print(smbcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(smbcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:55:18 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        //释放内存
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(smbcr);
+    smbcr = NULL;
 }
 
 /**
@@ -3234,6 +3420,9 @@ void dtu_modbus_json_set_modbus_cmdwn(int len , char *rcvdata)
                                                 dtu_file_ctx->modbus.cmd_wn[index].reg_n);
             }
         }
+        //删除json对象
+        cJSON_Delete(smbc);
+        smbc = NULL;
     }
 
     p_smsg.status = res;
@@ -3254,6 +3443,7 @@ void dtu_modbus_json_set_modbus_cmdwn(int len , char *rcvdata)
 static void dtu_modbus_json_set_modbus_cmdwn_res(UINT8 res)
 {
     cJSON *gmbcr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -3264,27 +3454,30 @@ static void dtu_modbus_json_set_modbus_cmdwn_res(UINT8 res)
     cJSON_AddItemToObject(gmbcr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(gmbcr)));
-    if(NULL != send)
+    out = cJSON_Print(gmbcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(gmbcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:55:28 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        //释放内存
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(gmbcr);
+    gmbcr = NULL;
 }
 
 /**
@@ -3301,6 +3494,7 @@ void dtu_modbus_json_modbus_res(UINT8* hex, UINT32 len)
 {
     cJSON *s01hr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     char* asciistr = NULL;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
@@ -3326,28 +3520,31 @@ void dtu_modbus_json_modbus_res(UINT8* hex, UINT32 len)
         cJSON_AddItemToObject(s01hr, "data", cJSON_CreateString(asciistr));
 
         //申请内存
-        send = malloc(strlen(cJSON_Print(s01hr)));
-        if(NULL != send)
+        out = cJSON_Print(s01hr);
+        if(NULL != out)
         {
-            memset(send, 0, strlen(send));
-            send = cJSON_PrintUnformatted(s01hr);  // 生成不带空格的JSON字符串
+            send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+            if(NULL != send)
+            {
+                uprintf("send:%s",send);
 
-//            uprintf("send:%s",send);
-
-            //发送数据到服务器
+                //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-            dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:55:38 by: zhaoning */
+                dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-            dtu_mqtt_send(send, strlen(send));
+                dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-            //释放内存
-            free(send);
+                cJSON_free(send);
+                send = NULL;
+            }
+            cJSON_free(out);
+            out = NULL;
         }
     }
     //删除json对象
     cJSON_Delete(s01hr);
+    s01hr = NULL;
 }
 
 /**
@@ -3395,6 +3592,9 @@ void dtu_modbus_json_set_modbus_data(int len , char *rcvdata)
             //发送数据到串口
             dtu_send_to_uart(hex, strlen(data->valuestring) / 2);
         }
+        //删除json对象
+        cJSON_Delete(smbd);
+        smbd = NULL;
     }
 }
 #endif /* ifdef DTU_TYPE_MODBUS_INCLUDE.2023-10-10 10:36:47 by: zhaoning */
@@ -3435,6 +3635,7 @@ static void dtu_http_json_get_http_config_res(void)
 {
     cJSON *ghtpcr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
 
@@ -3452,27 +3653,30 @@ static void dtu_http_json_get_http_config_res(void)
     cJSON_AddItemToObject(ghtpcr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(ghtpcr)));
-    if(NULL != send)
+    out = cJSON_Print(ghtpcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(ghtpcr);  // 生成不带空格的JSON字符串
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-//        uprintf("send:%s",send);
-
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:55:54 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        //释放内存
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(ghtpcr);
+    ghtpcr = NULL;
 }
 
 /**
@@ -3542,6 +3746,9 @@ void dtu_http_json_set_http_config(int len , char *rcvdata)
             }
             uprintf("enHttp %d", dtu_file_ctx->http.config.type);
         }
+        //删除json对象
+        cJSON_Delete(shtpc);
+        shtpc = NULL;
     }
 
     p_smsg.status = res;
@@ -3562,6 +3769,7 @@ void dtu_http_json_set_http_config(int len , char *rcvdata)
 static void dtu_http_json_set_http_config_res(UINT8 res)
 {
     cJSON *shtpcr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -3572,27 +3780,30 @@ static void dtu_http_json_set_http_config_res(UINT8 res)
     cJSON_AddItemToObject(shtpcr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(shtpcr)));
-    if(NULL != send)
+    out = cJSON_Print(shtpcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(shtpcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:56:10 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        //释放内存
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(shtpcr);
+    shtpcr = NULL;
 }
 
 /**
@@ -3630,6 +3841,7 @@ static void dtu_http_json_get_http_cmd_res(void)
 {
     cJSON *ghtpcr = NULL;
     cJSON *data = NULL;
+    char* out = NULL;
     char* send = NULL;
     DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
 
@@ -3671,27 +3883,30 @@ static void dtu_http_json_get_http_cmd_res(void)
     cJSON_AddItemToObject(ghtpcr, "data", data);
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(ghtpcr)));
-    if(NULL != send)
+    out = cJSON_Print(ghtpcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(ghtpcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:56:21 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        //释放内存
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(ghtpcr);
+    ghtpcr = NULL;
 }
 
 /**
@@ -3871,6 +4086,9 @@ void dtu_http_json_set_http_cmd(int len , char *rcvdata)
                                               dtu_file_ctx->http.http2.url);
             }
         }
+        //删除json对象
+        cJSON_Delete(shtpc);
+        shtpc = NULL;
     }
 
     p_smsg.status = res;
@@ -3891,6 +4109,7 @@ void dtu_http_json_set_http_cmd(int len , char *rcvdata)
 static void dtu_http_json_set_http_cmd_res(UINT8 res)
 {
     cJSON *shtpcr = NULL;
+    char* out = NULL;
     char* send = NULL;
 
     //创建json对象
@@ -3901,27 +4120,30 @@ static void dtu_http_json_set_http_cmd_res(UINT8 res)
     cJSON_AddItemToObject(shtpcr, "data", cJSON_CreateNumber(res));
     
     //申请内存
-    send = malloc(strlen(cJSON_Print(shtpcr)));
-    if(NULL != send)
+    out = cJSON_Print(shtpcr);
+    if(NULL != out)
     {
-        memset(send, 0, strlen(send));
-        send = cJSON_PrintUnformatted(shtpcr);  // 生成不带空格的JSON字符串
-        
-//        uprintf("send:%s",send);
+        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        if(NULL != send)
+        {
+            uprintf("send:%s",send);
 
-        //发送数据到服务器
+            //发送数据到服务器
 #ifdef DTU_BASED_ON_TCP
-        dtu_socket_write(send, strlen(send));
-#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 17:56:37 by: zhaoning */
+            dtu_socket_write(send, strlen(send));
+#endif /* ifdef DTU_BASED_ON_TCP.2023-11-3 15:46:57 by: zhaoning */
 #ifdef DTU_BASED_ON_MQTT
-        dtu_mqtt_send(send, strlen(send));
+            dtu_mqtt_send(send, strlen(send));
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 14:24:51 by: zhaoning */
-
-        //释放内存
-        free(send);
+            cJSON_free(send);
+            send = NULL;
+        }
+        cJSON_free(out);
+        out = NULL;
     }
     //删除json对象
     cJSON_Delete(shtpcr);
+    shtpcr = NULL;
 }
 
 #endif /* ifdef DTU_TYPE_HTTP_INCLUDE.2023-10-10 10:38:18 by: zhaoning */

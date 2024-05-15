@@ -190,7 +190,6 @@ void dtu_sys_json_set_sys_config(int len , char *rcvdata)
         data = cJSON_GetObjectItem(gdocg, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "enHb");
             dtu_file_ctx->hb.heartflag = item->valueint;
             item = cJSON_GetObjectItem(data, "cycHb");
@@ -406,7 +405,6 @@ void dtu_net_json_set_net_config(int len , char *rcvdata)
         data = cJSON_GetObjectItem(gdocg, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "IP");
             memset(dtu_file_ctx->socket.ip, 0, sizeof(dtu_file_ctx->socket.ip));
             memcpy(dtu_file_ctx->socket.ip, item->valuestring, strlen(item->valuestring));
@@ -620,7 +618,6 @@ void dtu_net_json_set_mqtt_config(int len , char *rcvdata)
         data = cJSON_GetObjectItem(gdocg, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "IP");
             memset(dtu_file_ctx->mqtt.ip, 0, sizeof(dtu_file_ctx->mqtt.ip));
             memcpy(dtu_file_ctx->mqtt.ip, item->valuestring, strlen(item->valuestring));
@@ -945,7 +942,6 @@ void dtu_di_json_set_di_config(int len , char *rcvdata)
         data = cJSON_GetObjectItem(gdicg, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "index");
             if(NULL != item)
             {
@@ -1250,7 +1246,6 @@ void dtu_do_json_set_do_value(int len , char *rcvdata)
         data = cJSON_GetObjectItem(gdov, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "DO1");
             if(NULL != item)
             {
@@ -1508,7 +1503,6 @@ void dtu_do_json_set_do_config(int len , char *rcvdata)
         data = cJSON_GetObjectItem(gdocg, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "index");
             if(NULL != item)
             {
@@ -1894,7 +1888,6 @@ void dtu_ai_json_set_ai_config(int len , char *rcvdata)
         data = cJSON_GetObjectItem(gaicg, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "enRpt1");
             en = item->valueint;
             item = cJSON_GetObjectItem(data, "cyc1");
@@ -2275,7 +2268,6 @@ void dtu_flow_json_set_flow_config(int len , char *rcvdata)
         data = cJSON_GetObjectItem(sfcg, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "index");
             if(NULL != item)
             {
@@ -2503,7 +2495,6 @@ void dtu_clk_json_set_clk_config(int len , char *rcvdata)
         data = cJSON_GetObjectItem(gclkcg, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "index");
             if(NULL != item)
             {
@@ -2780,7 +2771,6 @@ void dtu_ota_json_set_ota_config(int len , char *rcvdata)
         data = cJSON_GetObjectItem(gclkcg, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "url");
 
             res = 0;
@@ -2915,7 +2905,6 @@ void dtu_modbus_json_set_modbus_config(int len , char *rcvdata)
         data = cJSON_GetObjectItem(smbcr, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "enMb");
             type = item->valueint;
             item = cJSON_GetObjectItem(data, "wait");
@@ -3232,7 +3221,6 @@ void dtu_modbus_json_set_modbus_cmd(int len , char *rcvdata)
         data = cJSON_GetObjectItem(smbc, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "index");
             index = item->valueint;
             
@@ -3373,7 +3361,6 @@ void dtu_modbus_json_set_modbus_cmdwn(int len , char *rcvdata)
         data = cJSON_GetObjectItem(smbc, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "index");
             index = item->valueint;
             item = cJSON_GetObjectItem(data, "active");
@@ -3582,8 +3569,6 @@ void dtu_modbus_json_set_modbus_data(int len , char *rcvdata)
         data = cJSON_GetObjectItem(smbd, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
-
             //申请内存
             hex = malloc(strlen(data->valuestring) / 2 );
             memset(hex, 0, strlen(data->valuestring) / 2);
@@ -3714,7 +3699,6 @@ void dtu_http_json_set_http_config(int len , char *rcvdata)
         data = cJSON_GetObjectItem(shtpc, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "enHttp");
             type = item->valueint;
             if(DTU_HTTP_TYPE_ENABLE == type)
@@ -3945,7 +3929,6 @@ void dtu_http_json_set_http_cmd(int len , char *rcvdata)
         data = cJSON_GetObjectItem(shtpc, "data");
         if(NULL != data)
         {
-//            uprintf("data:%s",cJSON_Print(data));
             item = cJSON_GetObjectItem(data, "type1");
             if(NULL != item)
             {

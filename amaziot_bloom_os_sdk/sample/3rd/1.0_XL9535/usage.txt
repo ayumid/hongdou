@@ -1,0 +1,109 @@
+
+#include "ql_i2c_api.h"
+
+
+typedef enum
+{
+    STANDARD_MODE = 0,	/*100Kbps*/
+    FAST_MODE = 1,		/*400Kbps*/
+    HS_MODE = 2,		/*3.4 Mbps slave/3.3 Mbps master,standard mode when not doing a high speed transfer*/
+    HS_MODE_FAST = 3,	/*3.4 Mbps slave/3.3 Mbps master,fast mode when not doing a high speed transfer*/
+} QL_I2C_MODE_E;
+
+/*****************************************************************
+* Function: ql_i2c_init
+*
+* Description:
+* 	该函数用于初始化 I2C 总线。
+* 
+* Parameters:
+* 	i2c_no	  	[in] 	 I2C 通路索引号。
+*               0: i2c1 (SCL/SDA: GPIO_49/GPIO_50)
+*               1: i2c2 (SCL/SDA: GPIO_10/GPIO_11) 
+*               2: i2c3 (SCL/SDA: GPIO_12/GPIO_13)
+*               3: i2c4 (SCL/SDA: GPIO_25/GPIO_26) 
+* 	fastMode	[in] 	 I2C 的工作模式。
+* Return:
+* 	0 初始化成功
+*	-1 初始化失败
+*
+*****************************************************************/
+int ql_i2c_init(unsigned char i2c_no, unsigned int fastMode);
+
+/*****************************************************************
+* Function: ql_i2c_write
+*
+* Description:
+* 	该函数用于向 I2C 总线中写入数据。
+* 
+* Parameters:
+* 	i2c_no	  		[in] 	I2C 通路索引号。
+* 	slaveaddress	[in] 	I2C 设备地址。
+* 	addr			[in] 	I2C 寄存器地址。
+* 	data	 		[in] 	写入的数据。
+* 	datalen	  		[in] 	写入数据的长度。
+* Return:
+* 	0 写入成功
+*	-1 写入失败
+*
+*****************************************************************/
+int ql_i2c_write(unsigned char i2c_no, unsigned short slaveaddress, unsigned short addr, unsigned char *data, unsigned int datalen);
+
+/*****************************************************************
+* Function: ql_i2c_read
+*
+* Description:
+* 	该函数用于从 I2C 总线中读取数据。
+* 
+* Parameters:
+* 	i2c_no	  		[in] 	I2C 通路索引号。
+* 	slaveaddress	[in] 	I2C 设备地址。
+* 	addr			[in] 	I2C 寄存器地址。
+* 	data	 		[in] 	读取的数据。
+* 	datalen	  		[in] 	读取数据的长度。
+* Return:
+* 	0 读取成功
+*	-1 读取失败
+*
+*****************************************************************/
+int ql_i2c_read(unsigned char i2c_no, unsigned short slaveaddress, unsigned short addr, unsigned char *data, unsigned int datalen);
+
+/*****************************************************************
+* Function: ql_i2c_write_ext
+*
+* Description:
+* 	该函数用于向 I2C 总线中写入数据。
+* 
+* Parameters:
+* 	i2c_no	  		[in] 	I2C 通路索引号。
+* 	slaveaddress	[in] 	I2C 设备地址。
+* 	addr			[in] 	I2C 寄存器地址。
+* 	addrlen			[in] 	I2C 寄存器地址长度。
+* 	data	 		[in] 	写入的数据。
+* 	datalen	  		[in] 	写入数据的长度。
+* Return:
+* 	0 写入成功
+*	-1 写入失败
+*
+*****************************************************************/
+int ql_i2c_write_ext(unsigned char i2c_no, unsigned char slaveaddress,unsigned char *addr,unsigned int addrlen, unsigned char *data, unsigned int datalen);
+
+/*****************************************************************
+* Function: ql_i2c_read_ext
+*
+* Description:
+* 	该函数用于从 I2C 总线中读取数据。
+* 
+* Parameters:
+* 	i2c_no	  		[in] 	I2C 通路索引号。
+* 	slaveaddress	[in] 	I2C 设备地址。
+* 	addr			[in] 	I2C 寄存器地址。
+* 	addrlen			[in] 	I2C 寄存器地址长度。
+* 	data	 		[in] 	读取的数据。
+* 	datalen	  		[in] 	读取数据的长度。
+* Return:
+* 	0 读取成功
+*	-1 读取失败
+*
+*****************************************************************/
+int ql_i2c_read_ext(unsigned char i2c_no, unsigned char slaveaddress, unsigned char *addr,unsigned int addrlen, unsigned char *data, unsigned int datalen);

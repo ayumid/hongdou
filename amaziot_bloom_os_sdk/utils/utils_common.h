@@ -28,9 +28,9 @@
 
 #undef printf
 // debug uart log
-#define printf(fmt, args...) do { sdklogConfig(0); sdkLogPrintf(fmt, ##args); } while(0)
+#define printf(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
 // CATStudio usb log
-#define catstudio_printf(fmt, args...) do { sdklogConfig(0); sdkLogPrintf(fmt, ##args); } while(0)
+#define cprintf(fmt, args...) do { sdklogConfig(0); sdkLogPrintf(fmt, ##args); } while(0)
 
 #undef ASSERT
 #define ASSERT(cOND)	{if (!(cOND)) {utilsAssertFail(#cOND, __FILE__, (short)__LINE__, 1);}}

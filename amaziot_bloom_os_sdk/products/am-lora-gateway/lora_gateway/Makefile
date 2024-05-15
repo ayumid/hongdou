@@ -4,7 +4,7 @@ RM := cmd /c del /F /Q
 
 
 PROJECTFLAG ?= flag-1606l.mak
--include $(TOP)\amaziot_bloom_os_sdk\products\am-xtu\$(PROJECTFLAG)
+-include $(TOP)\amaziot_bloom_os_sdk\$(PROJECTFLAG)
 
 #=====================dtu version start========================#
 DTU_TCP := yes#TCP版本，定义这个宏定义

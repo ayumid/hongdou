@@ -3,7 +3,7 @@ RM := cmd /c del /F /Q
 
 
 PROJECTFLAG ?= flag-common.mak
--include $(TOP)\sample\$(PROJECTFLAG)
+-include $(TOP)\amaziot_bloom_os_sdk\$(PROJECTFLAG)
 
 
 OBJ_PATH := build\obj

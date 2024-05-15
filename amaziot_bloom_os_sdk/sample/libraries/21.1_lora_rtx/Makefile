@@ -4,7 +4,7 @@ RM := cmd /c del /F /Q
 
 
 PROJECTFLAG ?= flag-1606l.mak
--include $(TOP)\amaziot_bloom_os_sdk\sample\peripherals\$(PROJECTFLAG)
+-include $(TOP)\amaziot_bloom_os_sdk\$(PROJECTFLAG)
 
 #=====================CSDK_CODE start========================#
 BUILD_VARIANT := 

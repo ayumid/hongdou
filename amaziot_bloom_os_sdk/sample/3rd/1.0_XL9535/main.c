@@ -116,7 +116,7 @@ void Phase2Inits_exit(void)
 
     //初始化int引脚，这里使用70脚 gpio126
     config.pinDir = GPIO_IN_PIN;
-    config.pinEd = GPIO_RISE_EDGE;
+    config.pinEd = GPIO_TWO_EDGE;
     config.pinPull = GPIO_PULLUP_ENABLE;
     config.isr = sample_xl9535_irq_handler;
     GpioInitConfiguration(SAMPLE_GPIO_ISR_PIN_NUM, config);
@@ -272,6 +272,7 @@ void sample_xl9535_detect_task(void *param)
 
             //寄存器值非默认值，表示有io输入，否则表示是上升沿中断
             if(RegReadValue0 != 0xff || RegReadValue1 != 0x07)
+//            if(GpioGetLevel(SAMPLE_GPIO_ISR_PIN_NUM) == 0)
             {
                 event_ticks = OSAGetTicks();
                 int_status = 0;
@@ -339,10 +340,11 @@ void sample_xl9535_detect_task(void *param)
                 {
                     UINT32 keep_ticks = OSAGetTicks() - event_ticks;
                     
-                    if(keep_ticks > 20)
+                    if(keep_ticks > 30)
                     {
                         //检测到某个IO被按下后，可以在这里，或者发送信号，消息等去其它任务执行相应操作
-//                        sample_xl9535_catstudio_printf("keep_ticks:%d, event_ticks:%d", keep_ticks, event_ticks);
+                        sample_xl9535_catstudio_printf("keep_ticks:%d, event_ticks:%d", keep_ticks, event_ticks);
+                        event_ticks = 0;
                         if(down_en == 1)
                         {
                             sample_xl9535_catstudio_printf("down en");

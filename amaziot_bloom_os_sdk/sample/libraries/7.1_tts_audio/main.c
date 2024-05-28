@@ -1,3 +1,23 @@
+//------------------------------------------------------------------------------
+// Copyright , 2017-2023 奇迹物联（北京）科技有限公司
+// Filename    : main.c
+// Auther      : zhaoning
+// Version     :
+// Date : 2024-5-21
+// Description :
+//          
+//          
+// History     :
+//     
+//    1. Time         :  2024-5-21
+//       Modificator  : zhaoning
+//       Modification : Created
+//    2.
+// Others :
+//------------------------------------------------------------------------------
+
+// Includes ---------------------------------------------------------------------
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -10,25 +30,37 @@
 #include "old_tts_api.h"
 #include "AudioHAL.h"
 
+// Private defines / typedefs ---------------------------------------------------
+
 /*Log太多的时候不建议使用UART log，会出现很多异常，建议使用CATStudio 查看log*/
 // debug uart log
-#define sdk_uart_printf(fmt, args...) do { RTI_LOG("[sdk]"fmt, ##args); } while(0)
+#define sdk_uart_printf(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
 // CATStudio usb log
-#define catstudio_printf(fmt, args...) do { CPUartLogPrintf("[sdk]"fmt, ##args); } while(0)
+#define catstudio_printf(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
 
 #define _TASK_STACK_SIZE     2048
+
+
+#define TASK_TIMER_CHANGE_FLAG_BIT    0x01
+
+// Private variables ------------------------------------------------------------
+
 static void* _task_stack;
 
 static OSTaskRef _task_ref = NULL;
 static OSATimerRef _timer_ref = NULL;
 static OSFlagRef _flag_ref = NULL;
 
-#define TASK_TIMER_CHANGE_FLAG_BIT    0x01
+// Public variables -------------------------------------------------------------
+
+// Private functions prototypes -------------------------------------------------
 
 static void _timer_callback(UINT32 tmrId);
 static void _task(void *ptr);
 
+// Public functions prototypes --------------------------------------------------
 
+// Functions --------------------------------------------------------------------
 
 extern void update_the_cp_ver(char *cp_ver);    // max length 128
 // Device bootup hook before Phase1Inits.
@@ -130,7 +162,7 @@ static void _task(void *ptr)
             if(count % 3 == 0){
                 
                 AUDIO_TTS_SPEED(TIHO_TTS_SPEED_MIN);    
-                AUDIO_TTS_RUN((char *)tts_data, tts_data_len, tts_play_callback, NULL);
+                AUDIO_TTS_RUN((char *)tts_data, tts_data_len, tts_play_callback, NULL);                        
             }
             else if(count % 3 == 1){
                             
@@ -164,3 +196,5 @@ static void _task(void *ptr)
         }
     }
 }
+
+// End of file : main.c 2024-5-21 10:16:53 by: zhaoning 

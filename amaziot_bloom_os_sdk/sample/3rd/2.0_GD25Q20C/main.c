@@ -166,14 +166,12 @@ static void sample_gd25q20_task(void *ptr)
             sample_gd25q20_uart_printf("SPI read-write succeed 2");
         }
     }
+//    memset(writeBuf, 0x00, sizeof(writeBuf));
+//    memset(readBuf, 0x00, sizeof(readBuf));
 
+//    writeBuf[0] = 0x9F;
     while (1)
     {
-//        memset(writeBuf, 0x00, sizeof(writeBuf));
-//        memset(readBuf, 0x00, sizeof(readBuf));
-
-//        writeBuf[0] = 0x9F;
-
 //        ret = ql_spi_write_read(QL_SPI_PORT0, readBuf, writeBuf, 1);
 //        sample_gd25q20_catstudio_printf("ql_spi_write_read ret %d, readBuf %02X,%02X,%02X\n", ret, readBuf[0], readBuf[1], readBuf[2]);
 //        ret = ql_spi_write(QL_SPI_PORT0, writeBuf, 1);

@@ -52,29 +52,29 @@
 #ifndef _EXT_AT_CMDS_H_
 #define _EXT_AT_CMDS_H_
 
-RETURNCODE_T  AtEXTONOFF(             const utlAtParameterOp_T         op,
-        const char                        *command_name_p,
-        const utlAtParameterValue_P2c    parameter_values_p,
-        const size_t                    num_parameters,
-        const char                        *info_text_p,
-        unsigned int                    *xid_p,
-        void                            *arg_p);
+RETURNCODE_T  AtEXTONOFF(			 const utlAtParameterOp_T		 op,
+		const char						*command_name_p,
+		const utlAtParameterValue_P2c	parameter_values_p,
+		const size_t					num_parameters,
+		const char						*info_text_p,
+		unsigned int					*xid_p,
+		void							*arg_p);
 
 
-RETURNCODE_T  AtEXTSWVER(             const utlAtParameterOp_T         op,
-        const char                        *command_name_p,
-        const utlAtParameterValue_P2c    parameter_values_p,
-        const size_t                    num_parameters,
-        const char                        *info_text_p,
-        unsigned int                    *xid_p,
-        void                            *arg_p);
+RETURNCODE_T  AtEXTSWVER(			 const utlAtParameterOp_T		 op,
+		const char						*command_name_p,
+		const utlAtParameterValue_P2c	parameter_values_p,
+		const size_t					num_parameters,
+		const char						*info_text_p,
+		unsigned int					*xid_p,
+		void							*arg_p);
 
-RETURNCODE_T  AtEXTCONFIG(             const utlAtParameterOp_T         op,
-        const char                        *command_name_p,
-        const utlAtParameterValue_P2c    parameter_values_p,
-        const size_t                    num_parameters,
-        const char                        *info_text_p,
-        unsigned int                    *xid_p,
-        void                            *arg_p);
+RETURNCODE_T  AtEXTCONFIG(			 const utlAtParameterOp_T		 op,
+		const char						*command_name_p,
+		const utlAtParameterValue_P2c	parameter_values_p,
+		const size_t					num_parameters,
+		const char						*info_text_p,
+		unsigned int					*xid_p,
+		void							*arg_p);
 
 #endif

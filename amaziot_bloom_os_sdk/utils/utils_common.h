@@ -28,7 +28,7 @@
 
 #undef printf
 // debug uart log
-#define printf(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
+#define uprintf(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
 // CATStudio usb log
 #define cprintf(fmt, args...) do { sdklogConfig(0); sdkLogPrintf(fmt, ##args); } while(0)
 

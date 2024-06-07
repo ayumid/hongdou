@@ -433,5 +433,5 @@ int32_t tm_data_to_bin(const uint8_t *hex_str, uint8_t **bin, uint32_t *size) {
     (*bin)[i] = cTemp;
   }
 
-  return ERR_OK;
+  return ERR_OK_;
 }

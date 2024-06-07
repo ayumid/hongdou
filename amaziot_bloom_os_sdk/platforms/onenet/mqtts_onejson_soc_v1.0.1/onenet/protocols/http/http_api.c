@@ -13,7 +13,7 @@
 #include "plat_osl.h"
 #include "plat_tcp.h"
 #include "plat_time.h"
-
+#include "common/log.h"
 #if CONFIG_NETWORK_TLS
 #include "tls.h"
 #endif
@@ -105,7 +105,7 @@ static int32_t parse_host(const uint8_t* host, struct http_server_addr_t* addr)
         addr->port = 80;
     }
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 void* http_new(enum http_method_e method, const uint8_t* host, const uint8_t* abs_path, uint32_t size)
@@ -175,7 +175,7 @@ int32_t http_add_param(void* ctx, const uint8_t* name, const uint8_t* value)
     osl_strcat((uint8_t*)http_ctx->packet, value);
     http_ctx->status = PACK_URI_QUERY;
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 int32_t http_add_header(void* ctx, const uint8_t* name, const uint8_t* value)
@@ -205,7 +205,7 @@ int32_t http_add_header(void* ctx, const uint8_t* name, const uint8_t* value)
     osl_strcat((uint8_t*)http_ctx->packet, value);
     osl_strcat((uint8_t*)http_ctx->packet, (const uint8_t*)"\r\n");
     http_ctx->status = PACK_HEADER;
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 static void refresh_content_length(struct http_ctx_t* http_ctx, uint32_t content_length)
@@ -247,7 +247,7 @@ int32_t http_add_body(void* ctx, uint8_t* body, uint32_t body_len)
     }
     http_ctx->status = PACK_BODY;
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 static int32_t parse_header(uint8_t* data, struct http_kv_t* kv)
@@ -373,7 +373,7 @@ static int32_t send_request(
     handle_t                  net_hdl  = -1;
     handle_t                  cd_hdl   = countdown_start(timeout_ms);
     struct http_server_addr_t net_addr = { 0 };
-    int32_t                   ret      = ERR_OK;
+    int32_t                   ret      = ERR_OK_;
     uint32_t                  data_len = 0;
 
     net_addr.addr = (server) ? (uint8_t*)server : http_ctx->addr.addr;
@@ -440,7 +440,7 @@ static int32_t send_request(
             goto exit1;
         }
     } while (0 == countdown_is_expired(cd_hdl));
-    ret = ERR_TIMEOUT;
+    ret = ERR_TIMEOUT_;
 
 exit1:
     plat_tcp_disconnect(net_hdl);
@@ -484,7 +484,7 @@ int32_t http_get_resp_header(void* ctx, const uint8_t* name, const uint8_t** val
             if (value) {
                 *value = http_ctx->headers[i].value.str;
             }
-            return ERR_OK;
+            return ERR_OK_;
         }
     }
 

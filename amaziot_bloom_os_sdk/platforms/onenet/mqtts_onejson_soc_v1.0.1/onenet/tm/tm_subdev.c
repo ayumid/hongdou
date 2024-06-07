@@ -82,7 +82,7 @@ static int32_t subdev_data_callback(const uint8_t* name, void* data, uint32_t da
             osl_free(topo);
             cJSON_Delete(params);
         }
-        if (ERR_OK == ret) {
+        if (ERR_OK_ == ret) {
             tm_send_response(TM_TOPIC_SUBDEV_TOPO_CHANGE_REPLY, id, 200, 0, NULL, 0, CONFIG_DEFAULT_REQUEST_TIMEOUT);
         } else {
             tm_send_response(TM_TOPIC_SUBDEV_TOPO_CHANGE_REPLY, id, 100, 0, NULL, 0, CONFIG_DEFAULT_REQUEST_TIMEOUT);
@@ -99,7 +99,7 @@ static int32_t subdev_data_callback(const uint8_t* name, void* data, uint32_t da
             }
             osl_free(topo_data);
         }
-        if (ERR_OK == ret) {
+        if (ERR_OK_ == ret) {
             tm_send_response(TM_TOPIC_SUBDEV_TOPO_GET_REPLY_RESULT, id, 200, 0, NULL, 0, CONFIG_DEFAULT_REQUEST_TIMEOUT);
         } else {
             tm_send_response(TM_TOPIC_SUBDEV_TOPO_GET_REPLY_RESULT, id, 100, 0, NULL, 0, CONFIG_DEFAULT_REQUEST_TIMEOUT);
@@ -107,18 +107,18 @@ static int32_t subdev_data_callback(const uint8_t* name, void* data, uint32_t da
     } else if (NULL != osl_strstr(name, TM_TOPIC_SUBDEV_SERVICE_INVOKE)) {
         uint8_t  id[16]       = { 0 };
         void*    service_data = tm_onejson_parse_request(data, data_len, id, 0);
-        uint8_t* product_id   = cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)service_data, "productID"));
-        uint8_t* dev_name     = cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)service_data, "deviceName"));
-        uint8_t* svc_id       = cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)service_data, "identifier"));
+        uint8_t* product_id   = (uint8_t*)cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)service_data, "productID"));
+        uint8_t* dev_name     = (uint8_t*)cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)service_data, "deviceName"));
+        uint8_t* svc_id       = (uint8_t*)cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)service_data, "identifier"));
         cJSON*   input        = cJSON_DetachItemFromObject((cJSON*)service_data, "input");
-        uint8_t* input_data   = cJSON_PrintUnformatted(input);
+        uint8_t* input_data   = (uint8_t*)cJSON_PrintUnformatted(input);
         uint8_t* output_data  = NULL;
 
         ret = subdev_callbacks.subdev_service_invoke(product_id, dev_name, svc_id, input_data, &output_data);
         cJSON_AddRawToObject((cJSON*)service_data, "output", output_data);
         cJSON_Delete(input);
         osl_free(input_data);
-        if (ERR_OK == ret) {
+        if (ERR_OK_ == ret) {
             tm_send_response(TM_TOPIC_SUBDEV_SERVICE_INVOKE_REPLY, id, 200, 0, service_data, osl_strlen(output_data), CONFIG_DEFAULT_REQUEST_TIMEOUT);
         } else {
             cJSON_Delete((cJSON*)service_data);
@@ -130,16 +130,16 @@ static int32_t subdev_data_callback(const uint8_t* name, void* data, uint32_t da
     } else if (NULL != osl_strstr(name, TM_TOPIC_SUBDEV_PROP_GET)) {
         uint8_t  id[16]         = { 0 };
         void*    prop_list_data = tm_onejson_parse_request(data, data_len, id, 0);
-        uint8_t* product_id     = cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)prop_list_data, "productID"));
-        uint8_t* dev_name       = cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)prop_list_data, "deviceName"));
+        uint8_t* product_id     = (uint8_t*)cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)prop_list_data, "productID"));
+        uint8_t* dev_name       = (uint8_t*)cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)prop_list_data, "deviceName"));
         cJSON*   params         = cJSON_GetObjectItem((cJSON*)prop_list_data, "params");
-        uint8_t* prop_list      = cJSON_PrintUnformatted(params);
+        uint8_t* prop_list      = (uint8_t*)cJSON_PrintUnformatted(params);
         uint8_t* prop_data      = NULL;
 
         ret = subdev_callbacks.subdev_props_get(product_id, dev_name, prop_list, &prop_data);
         cJSON_Delete(prop_list_data);
         osl_free(prop_list);
-        if (ERR_OK == ret) {
+        if (ERR_OK_ == ret) {
             tm_send_response(TM_TOPIC_SUBDEV_PROP_GET_REPLY, id, 200, 1, prop_data, osl_strlen(prop_data), CONFIG_DEFAULT_REQUEST_TIMEOUT);
         } else {
             tm_send_response(TM_TOPIC_SUBDEV_PROP_GET_REPLY, id, 100, 0, NULL, 0, CONFIG_DEFAULT_REQUEST_TIMEOUT);
@@ -150,20 +150,22 @@ static int32_t subdev_data_callback(const uint8_t* name, void* data, uint32_t da
     } else if (NULL != osl_strstr(name, TM_TOPIC_SUBDEV_PROP_SET)) {
         uint8_t  id[16]        = { 0 };
         void*    prop_set_data = tm_onejson_parse_request(data, data_len, id, 0);
-        uint8_t* product_id    = cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)prop_set_data, "productID"));
-        uint8_t* dev_name      = cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)prop_set_data, "deviceName"));
+        uint8_t* product_id    = (uint8_t*)cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)prop_set_data, "productID"));
+        uint8_t* dev_name      = (uint8_t*)cJSON_GetStringValue(cJSON_GetObjectItem((cJSON*)prop_set_data, "deviceName"));
         cJSON*   params        = cJSON_GetObjectItem((cJSON*)prop_set_data, "params");
-        uint8_t* prop_data     = cJSON_PrintUnformatted(params);
+        uint8_t* prop_data     = (uint8_t*)cJSON_PrintUnformatted(params);
 
         ret = subdev_callbacks.subdev_props_set(product_id, dev_name, prop_data);
         cJSON_Delete(prop_set_data);
         osl_free(prop_data);
-        if (ERR_OK == ret) {
+        if (ERR_OK_ == ret) {
             tm_send_response(TM_TOPIC_SUBDEV_PROP_SET_REPLY, id, 200, 1, NULL, 0, CONFIG_DEFAULT_REQUEST_TIMEOUT);
         } else {
             tm_send_response(TM_TOPIC_SUBDEV_PROP_GET_REPLY, id, 100, 0, NULL, 0, CONFIG_DEFAULT_REQUEST_TIMEOUT);
         }
     }
+
+    return ERR_OK_;
 }
 
 int32_t tm_subdev_init(struct tm_subdev_cbs callbacks)
@@ -171,7 +173,7 @@ int32_t tm_subdev_init(struct tm_subdev_cbs callbacks)
     osl_memcpy(&subdev_callbacks, &callbacks, sizeof(callbacks));
     tm_set_subdev_callback(subdev_data_callback);
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 static int32_t subdev_topo_add_delete(const uint8_t* action, const uint8_t* product_id, const uint8_t* dev_name, const uint8_t* access_key, uint32_t timeout_ms)
@@ -179,7 +181,7 @@ static int32_t subdev_topo_add_delete(const uint8_t* action, const uint8_t* prod
     uint8_t  dev_token[256] = { 0 };
     cJSON*   data           = cJSON_CreateObject();
     uint8_t* raw_data       = NULL;
-    int32_t  ret            = ERR_OK;
+    int32_t  ret            = ERR_OK_;
 
     if (NULL == data) {
         return ERR_ALLOC;
@@ -219,7 +221,7 @@ static int32_t subdev_login_logout(const uint8_t* action, const uint8_t* product
 {
     cJSON*   data     = cJSON_CreateObject();
     uint8_t* raw_data = NULL;
-    int32_t  ret      = ERR_OK;
+    int32_t  ret      = ERR_OK_;
 
     if (NULL == data) {
         return ERR_ALLOC;
@@ -251,7 +253,7 @@ int32_t tm_subdev_post_data(const uint8_t* product_id, const uint8_t* dev_name, 
 
     tm_post_pack_data(data, 3000);
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 #endif

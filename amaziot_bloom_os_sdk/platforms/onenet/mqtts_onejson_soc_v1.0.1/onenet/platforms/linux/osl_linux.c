@@ -75,12 +75,22 @@ void* osl_memset(void* dst, int32_t val, size_t n)
 
 uint8_t* osl_strdup(const uint8_t* s)
 {
-    return strdup(s);
+    return (uint8_t*)strdup(s);
 }
 
 uint8_t* osl_strndup(const uint8_t* s, size_t n)
 {
-    return strndup(s, n);
+    uint8_t* dst;
+
+    dst = (uint8_t*) osl_malloc (n + 1);
+    osl_memset(dst, 0x00, (n + 1));
+    if (dst != NULL)
+    {
+        osl_memcpy(dst, s, n);
+    }
+
+    return dst;
+    //return (uint8_t*)strndup(s, n);
 }
 
 uint8_t* osl_strcpy(uint8_t* s1, const uint8_t* s2)

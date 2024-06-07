@@ -10,7 +10,7 @@
 /*****************************************************************************/
 #include "mqtt_client.h"
 #include "data_types.h"
-#include "log.h"
+#include "common/log.h"
 #include "mqtt_api.h"
 #include "plat_osl.h"
 #include "plat_tcp.h"

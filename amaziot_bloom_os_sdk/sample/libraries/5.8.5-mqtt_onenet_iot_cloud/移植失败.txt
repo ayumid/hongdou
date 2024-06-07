@@ -1,0 +1,7 @@
+Error: L6218E: Undefined symbol posix_internal_error_ (referred from px_error.o).
+
+黄工 - 上海域格:
+这边暂时没出什么，你这边切换新的SDK试下，新的sdk完全独立编译
+
+黄工 - 上海域格:
+https://gitee.com/yuge-info/yugecat1opencpu.git

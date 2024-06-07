@@ -105,13 +105,14 @@
     #elif defined(WOLFSSL_SGX)
         #include <errno.h>
     #elif !defined(WOLFSSL_NO_SOCK)
+        #if 0
         #include <sys/types.h>
         #include <errno.h>
         #ifndef EBSNET
             #include <unistd.h>
         #endif
         #include <fcntl.h>
-
+    
         #if defined(HAVE_RTP_SYS)
             #include <socket.h>
         #elif defined(EBSNET)
@@ -128,6 +129,10 @@
                 #include <sys/ioctl.h>
             #endif
         #endif
+		#else
+		#include "sockets.h"
+		#include "netdb.h"
+		#endif
     #endif
 #endif /* USE_WINDOWS_API */
 

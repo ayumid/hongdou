@@ -11,7 +11,7 @@
 #include <string.h>
 
 #include "err_def.h"
-#include "log.h"
+#include "common/log.h"
 #include "plat_osl.h"
 #include "plat_time.h"
 #include "plat_udp.h"
@@ -423,7 +423,7 @@ static int32_t mdns_answer(void)
     packet_len += mdns_pack_rr_header(g_discov->net_buf, packet_len, &srv_name[1], 3, MDNS_RRTYPE_PTR, MDNS_RRCLASS_IN, DEFAULT_RR_TTL);
     packet_len += pack_rdata_ptr(g_discov->net_buf, packet_len, srv_name, 4);
 
-    plat_udp_send(g_discov->net_handle, g_discov->net_buf, packet_len, 3000);
+//    plat_udp_send(g_discov->net_handle, g_discov->net_buf, packet_len, 3000);
 
     return 0;
 }
@@ -521,7 +521,7 @@ static int32_t parse_and_process_query(uint8_t* data, uint32_t data_len)
             mdns_hdr.an_count = answer_cnt;
             mdns_pack_header(answers, &mdns_hdr);
             // logd("send answers(%d)",answer_len);
-            plat_udp_send(g_discov->net_handle, answers, answer_len, 3000);
+//            plat_udp_send(g_discov->net_handle, answers, answer_len, 3000);
         }
     }
 
@@ -531,93 +531,93 @@ static int32_t parse_and_process_query(uint8_t* data, uint32_t data_len)
     return ret;
 }
 
-int32_t discovery_start(struct discovery_info_t* info)
-{
-    int32_t ret = ERR_OK;
+//int32_t discovery_start(struct discovery_info_t* info)
+//{
+//    int32_t ret = ERR_OK_;
 
-    if (!info || !info->product_id || !info->dev_name || !info->dev_addr) {
-        return ERR_INVALID_PARAM;
-    }
-    g_discov = osl_calloc(1, sizeof(*g_discov));
-    if (!g_discov) {
-        return ERR_ALLOC;
-    }
-    g_discov->host_name = osl_calloc(1, 2 + osl_strlen(info->product_id) + osl_strlen(info->dev_name));
-    if (!g_discov->host_name) {
-        ret = ERR_ALLOC;
-        goto exit;
-    }
-    osl_sprintf(g_discov->host_name, "%s_%s", info->product_id, info->dev_name);
-    g_discov->notify_interval = info->notify_interval;
-    g_discov->s_addr          = info->dev_addr;
+//    if (!info || !info->product_id || !info->dev_name || !info->dev_addr) {
+//        return ERR_INVALID_PARAM;
+//    }
+//    g_discov = osl_calloc(1, sizeof(*g_discov));
+//    if (!g_discov) {
+//        return ERR_ALLOC;
+//    }
+//    g_discov->host_name = osl_calloc(1, 2 + osl_strlen(info->product_id) + osl_strlen(info->dev_name));
+//    if (!g_discov->host_name) {
+//        ret = ERR_ALLOC;
+//        goto exit;
+//    }
+//    osl_sprintf(g_discov->host_name, "%s_%s", info->product_id, info->dev_name);
+//    g_discov->notify_interval = info->notify_interval;
+//    g_discov->s_addr          = info->dev_addr;
 
-    g_discov->net_handle = plat_udp_connect(MDNS_DEFAULT_ADDR, MDNS_DEFAULT_PORT);
-    if (g_discov->net_handle < 0) {
-        ret = ERR_NETWORK;
-        goto exit1;
-    }
-    g_discov->net_buf = osl_calloc(1, NETWORK_SENDRECV_BUF_LEN);
-    if (!g_discov->net_buf) {
-        ret = ERR_ALLOC;
-        goto exit2;
-    }
+//    g_discov->net_handle = plat_udp_connect(MDNS_DEFAULT_ADDR, MDNS_DEFAULT_PORT);
+//    if (g_discov->net_handle < 0) {
+//        ret = ERR_NETWORK;
+//        goto exit1;
+//    }
+//    g_discov->net_buf = osl_calloc(1, NETWORK_SENDRECV_BUF_LEN);
+//    if (!g_discov->net_buf) {
+//        ret = ERR_ALLOC;
+//        goto exit2;
+//    }
 
-    return ERR_OK;
+//    return ERR_OK_;
 
-exit2:
-    plat_udp_disconnect(g_discov->net_handle);
-exit1:
-    osl_free(g_discov->host_name);
-exit:
-    osl_free(g_discov);
-    return ret;
-}
+//exit2:
+//    plat_udp_disconnect(g_discov->net_handle);
+//exit1:
+//    osl_free(g_discov->host_name);
+//exit:
+//    osl_free(g_discov);
+//    return ret;
+//}
 
-int32_t discovery_step(uint32_t timeout_ms)
-{
-    handle_t cd_hdl     = countdown_start(timeout_ms);
-    uint32_t recved_len = 0;
-    int32_t  ret        = ERR_TIMEOUT;
+//int32_t discovery_step(uint32_t timeout_ms)
+//{
+//    handle_t cd_hdl     = countdown_start(timeout_ms);
+//    uint32_t recved_len = 0;
+//    int32_t  ret        = ERR_TIMEOUT_;
 
-    do {
-        /** 尝试接收UDP消息*/
-        recved_len = plat_udp_recv(g_discov->net_handle, g_discov->net_buf, NETWORK_SENDRECV_BUF_LEN, countdown_left(cd_hdl));
-        if (0 < recved_len) {
-            if (1 == parse_and_process_query(g_discov->net_buf, recved_len)) {
-                ret = ERR_OK;
-                break;
-            }
-        }
+//    do {
+//        /** 尝试接收UDP消息*/
+//        recved_len = plat_udp_recv(g_discov->net_handle, g_discov->net_buf, NETWORK_SENDRECV_BUF_LEN, countdown_left(cd_hdl));
+//        if (0 < recved_len) {
+//            if (1 == parse_and_process_query(g_discov->net_buf, recved_len)) {
+//                ret = ERR_OK_;
+//                break;
+//            }
+//        }
 
-        /** 主动通知*/
-        if (g_discov->notify_interval) {
-            uint64_t now = time_count();
-            if (g_discov->notify_interval <= (now - g_discov->last_notify_time)) {
-                logd("Notify mdns");
-                mdns_answer();
-                g_discov->last_notify_time = now;
-            }
-        }
-        time_delay_ms(10);
-    } while (0 == countdown_is_expired(cd_hdl));
-    countdown_stop(cd_hdl);
+//        /** 主动通知*/
+//        if (g_discov->notify_interval) {
+//            uint64_t now = time_count();
+//            if (g_discov->notify_interval <= (now - g_discov->last_notify_time)) {
+//                logd("Notify mdns");
+//                mdns_answer();
+//                g_discov->last_notify_time = now;
+//            }
+//        }
+//        time_delay_ms(10);
+//    } while (0 == countdown_is_expired(cd_hdl));
+//    countdown_stop(cd_hdl);
 
-    return ret;
-}
+//    return ret;
+//}
 
-int32_t discovery_stop(void)
-{
-    if (g_discov) {
-        if (0 <= g_discov->net_handle) {
-            plat_udp_disconnect(g_discov->net_handle);
-        }
-        if (g_discov->net_buf) {
-            osl_free(g_discov->net_buf);
-        }
-        if (g_discov->host_name) {
-            osl_free(g_discov->host_name);
-        }
-        osl_free(g_discov);
-    }
-    return ERR_OK;
-}
+//int32_t discovery_stop(void)
+//{
+//    if (g_discov) {
+//        if (0 <= g_discov->net_handle) {
+//            plat_udp_disconnect(g_discov->net_handle);
+//        }
+//        if (g_discov->net_buf) {
+//            osl_free(g_discov->net_buf);
+//        }
+//        if (g_discov->host_name) {
+//            osl_free(g_discov->host_name);
+//        }
+//        osl_free(g_discov);
+//    }
+//    return ERR_OK_;
+//}

@@ -1,11 +1,11 @@
-#ifndef _ESP_USR_LOG_H_
-#define _ESP_USR_LOG_H_
+#ifndef _LOG_H_
+#define _LOG_H_
 
 /*
  * hlog is thread-safe,
  * 2021/01/25 suchangwei
  */
-
+#include "sdk_api.h"
 #include "config.h"
 #include <string.h>
 #define DIR_SEPARATOR '/'
@@ -55,13 +55,12 @@ extern "C"
     /// @return
     int logger_print(int level, const char* file, int line, const char* func, const char* fmt, ...);
 
-#define logd(...) logger_print(LOG_LEVEL_DEBUG, __FILENAME__, __LINE__, __FUNCTION__, __VA_ARGS__)
-#define logi(...) logger_print(LOG_LEVEL_INFO, __FILENAME__, __LINE__, __FUNCTION__, __VA_ARGS__)
-#define logw(...) logger_print(LOG_LEVEL_WARN, __FILENAME__, __LINE__, __FUNCTION__, __VA_ARGS__)
-#define loge(...) logger_print(LOG_LEVEL_ERROR, __FILENAME__, __LINE__, __FUNCTION__, __VA_ARGS__)
-#define logb(...) logger_print(LOG_LEVEL_BREAKPOINT, __FILENAME__, __LINE__, __FUNCTION__, __VA_ARGS__)
-#define logf(...) logger_print(LOG_LEVEL_FATAL, __FILENAME__, __LINE__, __FUNCTION__, __VA_ARGS__)
-
+#define logd(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
+#define logi(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
+#define logw(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
+#define loge(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
+#define logb(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
+#define logf(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
 
 // LOG_LEVEL_BREAKPOINT
 #define breakpoint() logb("breakpoint")

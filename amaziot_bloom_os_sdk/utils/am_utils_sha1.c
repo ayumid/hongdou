@@ -18,7 +18,7 @@
 
 // Includes ---------------------------------------------------------------------
 
-#include "utils_sha1.h"
+#include "am_utils_sha1.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -519,5 +519,5 @@ void utils_hmac_sha1_hex(const char *msg, int msg_len, char *digest, const char 
     memcpy(digest, out, SHA1_DIGEST_SIZE);
 }
 
-// End of file : utils_sha1.h 2021-12-7 11:57:43 by: zhaoning 
+// End of file : am_utils_sha1.h 2021-12-7 11:57:43 by: zhaoning 
 

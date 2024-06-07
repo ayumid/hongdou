@@ -15,7 +15,7 @@
 #include "tm_onejson.h"
 #include "tm_api.h"
 #include "plat_osl.h"
-#include "log.h"
+#include "common/log.h"
 #include "err_def.h"
 
 #include <stdio.h>
@@ -186,14 +186,14 @@ int32_t tm_send_response(const uint8_t *name, uint8_t *msg_id, int32_t msg_code,
 
     osl_free(payload);
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 #if defined(CONFIG_TM_MQTT)
 static int32_t wait_post_reply(int32_t post_id, handle_t cd_hdl)
 {
     uint8_t temp_id[16] = {0};
-    int32_t ret         = ERR_TIMEOUT;
+    int32_t ret         = ERR_TIMEOUT_;
 
     osl_sprintf(temp_id, (const uint8_t *)"%d", post_id);
 
@@ -213,7 +213,7 @@ static int32_t wait_post_reply(int32_t post_id, handle_t cd_hdl)
                 if (0 == osl_strcmp(temp_id, g_tm_obj.reply_info.reply_id))
                 {
                     g_tm_obj.reply_info.reply_status = REPLY_STATUS_NONE;
-                    ret                              = ERR_OK;
+                    ret                              = ERR_OK_;
                     break;
                 }
                 else
@@ -252,7 +252,7 @@ int32_t tm_send_request(const uint8_t *name, uint8_t as_raw, void *data, uint32_
     topic = construct_topic(g_tm_obj.topic_prefix, name);
 #if defined(CONFIG_TM_MQTT)
     ret = tm_mqtt_send_packet(topic, payload, payload_len, countdown_left(cd_hdl));
-    if (ERR_OK == ret)
+    if (ERR_OK_ == ret)
     {
         g_tm_obj.reply_info.reply_status = REPLY_STATUS_WAIT;
         if (0 == wait_post_reply(post_id, cd_hdl))
@@ -265,7 +265,7 @@ int32_t tm_send_request(const uint8_t *name, uint8_t as_raw, void *data, uint32_
                 {
                     *reply_data = g_tm_obj.reply_info.reply_data;
                 }
-                ret = ERR_OK;
+                ret = ERR_OK_;
             }
             else
             {
@@ -279,7 +279,7 @@ int32_t tm_send_request(const uint8_t *name, uint8_t as_raw, void *data, uint32_
 
 #elif defined(CONFIG_TM_COAP)
     ret = tm_coap_send_packet(topic, payload, payload_len, countdown_left(cd_hdl));
-    if (ERR_OK == ret)
+    if (ERR_OK_ == ret)
     {
         logd("tm_send_request ok.");
     }
@@ -289,7 +289,7 @@ int32_t tm_send_request(const uint8_t *name, uint8_t as_raw, void *data, uint32_
     }
 #elif defined(CONFIG_TM_NBIOT)
     ret = tm_lwm2m_send_packet(topic , payload, payload_len, countdown_left(cd_hdl));
-    if (ERR_OK == ret)
+    if (ERR_OK_ == ret)
     {
         logd("tm_send_request ok.");
     }
@@ -612,13 +612,13 @@ int32_t tm_set_subdev_callback(tm_subdev_cb callback)
 {
     g_tm_obj.subdev_callback = callback;
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 #endif
 
 int32_t tm_login(const uint8_t *product_id, const uint8_t *dev_name, const uint8_t *access_key,uint64_t expire_time, uint32_t timeout_ms)
 {
-    int32_t ret            = ERR_OK;
+    int32_t ret            = ERR_OK_;
     uint8_t dev_token[256] = {0};
 
     dev_token_generate(dev_token, SIG_METHOD_SHA1, expire_time, product_id, dev_name, access_key);
@@ -632,7 +632,7 @@ int32_t tm_login(const uint8_t *product_id, const uint8_t *dev_name, const uint8
     ret=tm_lwm2m_login();
 #endif
 
-    if (ERR_OK == ret)
+    if (ERR_OK_ == ret)
     {
         uint32_t topic_malloc_len = 0;
         uint32_t topic_prefix_len =
@@ -718,7 +718,7 @@ int32_t tm_get_desired_props(uint32_t timeout_ms)
 
     ret = tm_send_request((const uint8_t *)TM_TOPIC_DESIRED_PROPS_GET, 0, prop_list, 0, &reply_data, NULL, timeout_ms);
 
-    if (ERR_OK == ret)
+    if (ERR_OK_ == ret)
     {
         tm_data_list_each(reply_data, tm_prop_set_handle);
         logd("get desired props ok");

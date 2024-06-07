@@ -7,9 +7,9 @@ PROJECTFLAG ?= flag-1606l.mak
 -include $(TOP)\amaziot_bloom_os_sdk\$(PROJECTFLAG)
 
 #=====================dtu version start========================#
-DTU_TCP := yes#TCP版本，定义这个宏定义
-#DTU_MQTT := yes#MQTT版本，定义这个宏定义
-#DTU_GNSS := yes#包含GNSS功能，定义这个宏定义
+#DTU_TCP := yes#TCP版本，定义这个宏定义
+DTU_MQTT := yes#MQTT版本，定义这个宏定义
+DTU_GNSS := yes#包含GNSS功能，定义这个宏定义
 DTU_JSON := yes#包含JSON协议，定义这个宏定义
 DTU_CJSON := yes#包含CJSON，定义这个宏定义
 DTU_DODIAI := yes#包含DI，DO，AI功能，定义这个宏定义
@@ -19,13 +19,12 @@ DTU_MODBUS := yes#包含Modbus功能，定义这个宏定义
 #DTU_AGNSS := yes#包含AGNSS功能，定义这个宏定义，基于中科微agnss，其它厂家可能不适用
 
 #DTU_EXSIM := yes#使用外置卡功能，定义这个宏定义
-#DTU_5X6 := yes#使用5x6卡功能，定义这个宏定义
-DTU_3IN1 := yes#使用3和1卡功能，定义这个宏定义
+DTU_5X6 := yes#使用5x6卡功能，定义这个宏定义
+#DTU_3IN1 := yes#使用3和1卡功能，定义这个宏定义
 
 DTU_115200 := yes#使用波特率115200，定义这个宏定义
 #DTU_38400 := yes#使用波特率38400，定义这个宏定义
 #DTU_9600 := yes#使用波特率9600，定义这个宏定义
-
 ifeq ($(DTU_TCP), yes)
 COMMON_CFLAGS +=  -DDTU_BASED_ON_TCP
 endif
@@ -128,7 +127,7 @@ SOURCE_FILES += $(TOP)/amaziot_bloom_os_sdk/libraries/am/xtu/am_socket.c
 endif
 ifeq ($(DTU_MQTT), yes)
 SOURCE_FILES += $(TOP)/amaziot_bloom_os_sdk/libraries/am/xtu/am_mqtt.c \
-                $(TOP)/amaziot_bloom_os_sdk/utils/utils_sha1.c
+                $(TOP)/amaziot_bloom_os_sdk/utils/am_utils_sha1.c
 endif
 ifeq ($(DTU_GNSS), yes)
 SOURCE_FILES += $(TOP)/amaziot_bloom_os_sdk/libraries/am/xtu/am_gnss.c

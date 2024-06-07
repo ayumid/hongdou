@@ -13,14 +13,17 @@
 #include "plat_tcp.h"
 #include "plat_time.h"
 
-#include <errno.h>
-#include <fcntl.h>
-#include <netdb.h>
+//#include <errno.h>
+//#include <fcntl.h>
+//#include <netdb.h>
+//#include <stdio.h>
+//#include <sys/socket.h>
+//#include <sys/time.h>
+//#include <sys/types.h>
+//#include <unistd.h>
 #include <stdio.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include "sockets.h"
+#include "netdb.h"
 
 /*****************************************************************************/
 /* Local Definitions ( Constant and Macro )                                  */
@@ -80,7 +83,7 @@ handle_t plat_tcp_connect(const uint8_t* host, uint16_t port, uint32_t timeout_m
     int                ret   = -1;
 
     if (0 == (ip_addr = gethostbyname((const char*)host))) {
-        loge("connect %s:%d failed!", host, port);
+//        loge("connect %s:%d failed!", host, port);
         goto exit;
     }
 
@@ -132,7 +135,7 @@ int32_t plat_tcp_send(handle_t handle, void* buf, uint32_t len, uint32_t timeout
         ret = select(handle + 1, NULL, &fs, NULL, &tv);
         if (0 < ret) {
             if (FD_ISSET(handle, &fs)) {
-                ret = send(handle, buf + sent_len, len - sent_len, MSG_DONTWAIT);
+                ret = send(handle,(unsigned char *) buf + sent_len, len - sent_len, MSG_DONTWAIT);
                 if (0 < ret) {
                     sent_len += ret;
                 } else if (0 > ret) {
@@ -171,7 +174,7 @@ int32_t plat_tcp_recv(handle_t handle, void* buf, uint32_t len, uint32_t timeout
         ret = select(handle + 1, &fs, NULL, NULL, &tv);
         if (0 < ret) {
             if (FD_ISSET(handle, &fs)) {
-                ret = recv(handle, buf + recv_len, len - recv_len, MSG_DONTWAIT);
+                ret = recv(handle, (unsigned char *)buf + recv_len, len - recv_len, MSG_DONTWAIT);
                 if (0 < ret) {
                     recv_len += ret;
                 } else if (0 > ret) {

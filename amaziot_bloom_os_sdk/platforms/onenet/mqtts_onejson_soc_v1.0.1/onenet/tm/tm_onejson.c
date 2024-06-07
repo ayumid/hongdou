@@ -109,7 +109,7 @@ static int32_t set_value_with_timestamp(cJSON* data, const int8_t* name, cJSON* 
         }
     }
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 static int32_t set_value(cJSON* data, const int8_t* name, cJSON* value)
@@ -126,7 +126,7 @@ static int32_t set_value(cJSON* data, const int8_t* name, cJSON* value)
         }
     }
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 int32_t tm_onejson_pack_bool_with_timestamp(void* data, const int8_t* name, boolean val, int64_t ts_in_ms)
@@ -197,10 +197,10 @@ int32_t tm_onejson_list_each(void* data, tm_list_cb callback)
 {
     cJSON*  obj  = (cJSON*)data;
     cJSON*  item = obj->child;
-    int32_t ret  = ERR_OK;
+    int32_t ret  = ERR_OK_;
 
     while (item) {
-        if (ERR_OK != (ret = callback((const uint8_t*)item->string, (void*)item))) {
+        if (ERR_OK_ != (ret = callback((const uint8_t*)item->string, (void*)item))) {
             break;
         }
         item = item->next;
@@ -229,7 +229,7 @@ int32_t tm_onejson_parse_bool(void* data, boolean* val)
         *val = 0;
     }
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 int32_t tm_onejson_parse_number(void* data, float64_t* val)
@@ -240,7 +240,7 @@ int32_t tm_onejson_parse_number(void* data, float64_t* val)
 
     *val = get_value_item(obj)->valuedouble;
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 int32_t tm_onejson_parse_string(void* data, int8_t** val)
@@ -251,7 +251,7 @@ int32_t tm_onejson_parse_string(void* data, int8_t** val)
 
     *val = (uint8_t*)(get_value_item(obj)->valuestring);
 
-    return ERR_OK;
+    return ERR_OK_;
 }
 
 void* tm_onejson_pack_props_and_events(void* data, const uint8_t* product_id, const uint8_t* dev_name, void* props, void* events, uint8_t as_raw)

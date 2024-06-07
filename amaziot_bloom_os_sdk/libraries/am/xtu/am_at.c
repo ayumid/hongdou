@@ -35,7 +35,7 @@
 #endif /* ifdef DTU_TYPE_DODIAI_INCLUDE.2023-10-31 16:11:26 by: zhaoning */
 
 #ifdef DTU_BASED_ON_MQTT
-#include "utils_sha1.h"
+#include "am_utils_sha1.h"
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-30 17:34:15 by: zhaoning */
 
 // Private defines / typedefs ---------------------------------------------------

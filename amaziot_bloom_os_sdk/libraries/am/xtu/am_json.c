@@ -133,7 +133,7 @@ static void dtu_sys_json_get_sys_config_res(void)
     out = cJSON_Print(gdocr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -266,7 +266,7 @@ static void dtu_sys_json_set_sys_config_res(UINT8 res)
     out = cJSON_Print(gdocr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -348,7 +348,7 @@ static void dtu_net_json_get_net_config_res(void)
     out = cJSON_Print(gdocr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -465,7 +465,7 @@ static void dtu_net_json_set_net_config_res(UINT8 res)
     out = cJSON_Print(gdocr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -561,7 +561,7 @@ static void dtu_net_json_get_mqtt_config_res(void)
     out = cJSON_Print(gdocr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -706,7 +706,7 @@ static void dtu_net_json_set_mqtt_config_res(UINT8 res)
     out = cJSON_Print(gdocr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -788,7 +788,7 @@ static void dtu_di_json_get_di_value_res(void)
     out = cJSON_Print(gdivr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -881,7 +881,7 @@ static void dtu_di_json_get_di_config_res(void)
     out = cJSON_Print(gdicr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -1027,7 +1027,7 @@ static void dtu_di_json_set_di_config_res(UINT8 res)
     out = cJSON_Print(gdivr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -1113,7 +1113,7 @@ static void dtu_di_json_res(UINT8 type, UINT8 channel, UINT8 level)
     out = cJSON_Print(gdivr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -1192,7 +1192,7 @@ static void dtu_do_json_get_do_value_res(void)
     out = cJSON_Print(gdovr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -1339,7 +1339,7 @@ static void dtu_do_json_set_do_value_res(UINT8 res)
     out = cJSON_Print(gdovr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -1442,7 +1442,7 @@ static void dtu_do_json_get_do_config_res(void)
     out = cJSON_Print(gdocr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -1590,7 +1590,7 @@ static void dtu_do_json_set_do_config_res(UINT8 res)
     out = cJSON_Print(gdocr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -1663,7 +1663,7 @@ static void dtu_do_json_res(UINT8 channel, UINT8 level)
     out = cJSON_Print(gdor);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -1743,7 +1743,7 @@ static void dtu_ai_json_get_ai_value_res(void)
     out = cJSON_Print(gaivr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -1826,7 +1826,7 @@ static void dtu_ai_json_get_ai_config_res(void)
     out = cJSON_Print(gaicr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -1977,7 +1977,7 @@ static void dtu_ai_json_set_ai_config_res(UINT8 res)
     out = cJSON_Print(gaivr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -2125,7 +2125,7 @@ static void dtu_ai_json_res(void)
         out = cJSON_Print(gaivr);
         if(NULL != out)
         {
-            send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+            send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
             if(NULL != send)
             {
                 uprintf("send:%s",send);
@@ -2209,7 +2209,7 @@ static void dtu_flow_json_get_flow_config_res(void)
     out = cJSON_Print(gfcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -2323,7 +2323,7 @@ static void dtu_flow_json_set_flow_config_res(UINT8 res)
     out = cJSON_Print(gfcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -2431,7 +2431,7 @@ static void dtu_clk_json_get_clk_config_res(void)
     out = cJSON_Print(gclkcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -2590,7 +2590,7 @@ void dtu_clk_json_set_clk_config(int len , char *rcvdata)
             }
         }
         //删除json对象
-        cJSON_Delete(gclkcg;
+        cJSON_Delete(gclkcg);
         gclkcg = NULL;
     }
 
@@ -2626,7 +2626,7 @@ static void dtu_clk_json_set_clk_config_res(UINT8 res)
     out = cJSON_Print(gclkcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -2685,7 +2685,7 @@ static void dtu_fota_result_json_cbk(UINT32 result)
     out = cJSON_Print(gota);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -2845,7 +2845,7 @@ static void dtu_modbus_json_get_modbus_config_res(void)
     out = cJSON_Print(gmbcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -2991,7 +2991,7 @@ static void dtu_modbus_json_set_modbus_config_res(UINT8 res)
     out = cJSON_Print(smbcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -3074,7 +3074,7 @@ static void dtu_modbus_json_get_modbus_cmd_res(UINT8 id)
     out = cJSON_Print(gmbcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -3158,7 +3158,7 @@ static void dtu_modbus_json_get_modbus_cmdwn_res(UINT8 id)
     out = cJSON_Print(gmbcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -3302,7 +3302,7 @@ static void dtu_modbus_json_set_modbus_cmd_res(UINT8 res)
     out = cJSON_Print(smbcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -3444,7 +3444,7 @@ static void dtu_modbus_json_set_modbus_cmdwn_res(UINT8 res)
     out = cJSON_Print(gmbcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -3510,7 +3510,7 @@ void dtu_modbus_json_modbus_res(UINT8* hex, UINT32 len)
         out = cJSON_Print(s01hr);
         if(NULL != out)
         {
-            send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+            send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
             if(NULL != send)
             {
                 uprintf("send:%s",send);
@@ -3641,7 +3641,7 @@ static void dtu_http_json_get_http_config_res(void)
     out = cJSON_Print(ghtpcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -3767,7 +3767,7 @@ static void dtu_http_json_set_http_config_res(UINT8 res)
     out = cJSON_Print(shtpcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -3870,7 +3870,7 @@ static void dtu_http_json_get_http_cmd_res(void)
     out = cJSON_Print(ghtpcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);
@@ -4106,7 +4106,7 @@ static void dtu_http_json_set_http_cmd_res(UINT8 res)
     out = cJSON_Print(shtpcr);
     if(NULL != out)
     {
-        send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+        send = (char*)cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
         if(NULL != send)
         {
             uprintf("send:%s",send);

@@ -141,12 +141,16 @@
 	    #elif defined(__IAR_SYSTEMS_ICC__)
 	        #define INLINE inline
 	    #elif defined(THREADX)
-	        #define INLINE _Inline
+//	        #define INLINE _Inline
 	    #else
 	        #define INLINE
 	    #endif
 	#else
-	    #define INLINE
+	    //#define INLINE
+	    #ifdef INLINE
+		#undef INLINE
+		#define INLINE
+		#endif
 	#endif
 	#endif
 

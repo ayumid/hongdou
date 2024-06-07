@@ -1,13 +1,19 @@
-#include "log.h"
+#include "common/log.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <sys/time.h>
-#include <time.h>
+//#include <sys/time.h>
+#include "time.h"//<time.h>
 
+// debug uart log
+#define sdk_uart_printf(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
+// CATStudio usb log
+#define catstudio_printf(fmt, args...) do { sdklogConfig(1); sdkLogPrintf(fmt, ##args); } while(0)
+
+#if 0
 #define RED(str) "\033[31m" str "\033[0m"
 #define B_RED(str) "\033[1;31m" str "\033[0m"
 #define B_GREEN(str) "\033[1;32m" str "\033[0m"
@@ -15,8 +21,16 @@
 #define YELLOW(str) "\033[33m" str "\033[0m"
 #define MAGENTA(str) "\033[35m" str "\033[0m"
 #define CYAN(str) "\033[36m" str "\033[0m"
-
-char log_buf[LOG_MAX_BUFSIZE] = { 0 };
+#else
+#define RED(str) str
+#define B_RED(str) str
+#define B_GREEN(str) str
+#define B_WHITE(str) str
+#define YELLOW(str) str
+#define MAGENTA(str) str
+#define CYAN(str) str
+#endif
+char onenet_log_buf[LOG_MAX_BUFSIZE] = { 0 };
 
 char* strupr(char* str)
 {
@@ -83,7 +97,7 @@ int logger_print(int level, const char* file, int line, const char* func, const 
         snprintf(timestamp_str, sizeof(timestamp_str), "%04d-%02d-%02d %02d:%02d:%02d.%03d", year, month, day, hour, min, sec, ms);
     }
 
-    char* buf     = log_buf;
+    char* buf     = onenet_log_buf;
     int   bufsize = LOG_MAX_BUFSIZE;
     int   len     = 0;
 
@@ -100,6 +114,7 @@ int logger_print(int level, const char* file, int line, const char* func, const 
         len += snprintf(buf + len, bufsize - len, "%s[%s:%d:%s]\n", (buf[len - 1] == '\n') ? ("") : (" "), file, line, func);
     }
 
-    printf("%s", buf);
+    //printf("%s", buf);
+    catstudio_printf("%s", buf);
     return len;
 }

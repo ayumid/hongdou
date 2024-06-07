@@ -11,9 +11,10 @@
 #include "plat_osl.h"
 #include "plat_time.h"
 
-#include <sys/time.h>
-#include <time.h>
+//#include <sys/time.h>
+//#include <time.h>
 #include <unistd.h>
+#include "utltime.h"
 
 /*****************************************************************************/
 /* Local Definitions ( Constant and Macro )                                  */
@@ -52,9 +53,17 @@ uint64_t time_count_ms(void) {
 
 uint64_t time_count(void) { return (uint64_t)time(NULL); }
 
-void time_delay_ms(uint32_t m_sec) { usleep(m_sec * 1000); }
+void time_delay_ms(uint32_t m_sec) 
+{ 
+    OSATaskSleep((m_sec > 5)?(m_sec/5):1);
+    //usleep(m_sec * 1000); 
+}
 
-void time_delay(uint32_t sec) { sleep(sec); }
+void time_delay(uint32_t sec) 
+{
+    OSATaskSleep((sec > 1)?(sec*200):1);
+    //sleep(sec); 
+}
 
 handle_t countdown_start(uint32_t ms) {
   struct countdown_tmr_t *tmr = NULL;

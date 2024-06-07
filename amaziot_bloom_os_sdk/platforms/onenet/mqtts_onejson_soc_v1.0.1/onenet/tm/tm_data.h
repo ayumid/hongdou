@@ -36,7 +36,7 @@ typedef int32_t (*tm_list_cb)(const uint8_t * /**data_name*/,
  *
  * @return void* 数据实例句柄
  */
-void *tm_data_create();
+void *tm_data_create(void);
 
 /**
  * @brief 创建一个结构体数据实例

@@ -908,7 +908,6 @@ int32_t tm_event_Fault_Alar_notify(void *data, struct event_Fault_Alar_t val, ui
 
     return ret;
 }
-}
 
 
 /****************************** Auto Generated *******************************/

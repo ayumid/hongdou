@@ -25,7 +25,7 @@ extern "C"
  * @{
  */
 /** 成功*/
-#define ERR_OK 0
+#define ERR_OK_ 0
 /** @} */
 
 /**
@@ -57,7 +57,7 @@ extern "C"
 /** 云端错误*/
 #define ERR_CLOUD -12
 /** 超时*/
-#define ERR_TIMEOUT -13
+#define ERR_TIMEOUT_ -13
 /** 请求处理失败*/
 #define ERR_REQUEST_FAILED -14
 /** 数据溢出*/
@@ -73,7 +73,7 @@ extern "C"
 /*****************************************************************************/
 /* External Variables and Functions                                          */
 /*****************************************************************************/
-#include "log.h"
+#include "common/log.h"
 #ifndef CHECK_EXPR_GOTO
 #define CHECK_EXPR_GOTO(expr, label, fmt...)                                                                                                                   \
     do {                                                                                                                                                       \

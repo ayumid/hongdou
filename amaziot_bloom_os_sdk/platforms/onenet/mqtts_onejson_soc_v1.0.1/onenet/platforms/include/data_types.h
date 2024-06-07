@@ -41,8 +41,8 @@ typedef unsigned long long uint64_t;
 #include <stdbool.h>
 #include <stdint.h>
 
-#define TRUE  true
-#define FALSE false
+//#define TRUE  true
+//#define FALSE false
 
 typedef bool      boolean;
 #endif

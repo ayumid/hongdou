@@ -246,11 +246,11 @@ void sample_xl9535_detect_task(void *param)
     //初始化xl0535 io扩展芯片的06 07寄存器，设置所有的io都是输入
     RegAddr       = 0x06;
     RegWriteValue = 0xFF;
-    ret = drv_xl9535_i2c_write(&RegAddr, &RegReadValue0);
+    ret = drv_xl9535_i2c_write(&RegAddr, &RegWriteValue);
     sample_xl9535_catstudio_printf("write i2c value=0x%x, ret=%d\n", RegWriteValue, ret);
     RegAddr       = 0x07;
     RegWriteValue = 0xFF;
-    ret = drv_xl9535_i2c_write(&RegAddr, &RegReadValue0);
+    ret = drv_xl9535_i2c_write(&RegAddr, &RegWriteValue);
     sample_xl9535_catstudio_printf("write i2c value=0x%x, ret=%d\n", RegWriteValue, ret);
     
     while(1)

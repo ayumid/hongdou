@@ -96,7 +96,7 @@ void dtu_format_send(char * raw_data, UINT16 len)
         out = cJSON_Print(format);
         if(NULL != out)
         {
-            send = cJSON_PrintUnformatted(out);  // 生成不带空格的JSON字符串
+            send = cJSON_PrintUnformatted((cJSON*)out);  // 生成不带空格的JSON字符串
             if(NULL != send)
             {
                 uprintf("send:%s",send);

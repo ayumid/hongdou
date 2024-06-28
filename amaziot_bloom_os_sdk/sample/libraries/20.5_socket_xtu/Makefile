@@ -22,7 +22,7 @@ endif
 $(shell mkdir $(CSDK_OBJ_PATH))
 #=====================CSDK_CODE end========================#
 
-COMMON_CFLAGS += -I$(CURDIR)\am\inc
+COMMON_CFLAGS += -I$(CURDIR)
 COMMON_CFLAGS += -I$(CURDIR)\atcmds\inc
 COMMON_CFLAGS += -I$(TOP)/amaziot_bloom_os_sdk/libraries\am\xtu
 COMMON_CFLAGS +=  -DDTU_BASED_ON_TCP

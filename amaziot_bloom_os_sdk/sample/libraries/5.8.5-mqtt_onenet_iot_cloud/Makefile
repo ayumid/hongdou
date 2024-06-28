@@ -13,7 +13,7 @@ CSDK_OBJ_FILES :=
 CSDK_OBJ_PATH := 
 CSDK_LIB_FILE := 
 
-ONENET_IOT_CLOUD := $(TOP)/amaziot_bloom_os_sdk/platforms/onenet/mqtts_onejson_soc_v1.0.1
+ONENET_IOT_CLOUD := $(TOP)/amaziot_bloom_os_sdk/third_party/onenet/mqtts_onejson_soc_v1.0.1
 
 ifneq (${BUILD_VARIANT}, )
 CSDK_LIB_FILE += build\CSDK_CODE.lib

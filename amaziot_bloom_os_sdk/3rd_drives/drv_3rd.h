@@ -41,6 +41,18 @@ extern "C" {
         sdkLogPrintf(fmt, ##args);     \
     } while (0)
 
+extern void DelayInMilliSecond(unsigned int us);
+extern void Timer0_Switch(unsigned char OnOff);
+
+#define drv_3rd_delay_us(count) \
+    do                                \
+    {                                 \
+        Timer0_Switch(1);             \
+        DelayInMilliSecond(count);    \
+        Timer0_Switch(0);             \
+    } while (0)
+
+
 // Public functions prototypes --------------------------------------------------
 
 #ifdef __cplusplus

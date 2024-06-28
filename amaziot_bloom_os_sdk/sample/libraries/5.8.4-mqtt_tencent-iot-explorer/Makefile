@@ -15,7 +15,7 @@ CSDK_OBJ_FILES :=
 CSDK_OBJ_PATH := 
 CSDK_LIB_FILE := 
 
-TENCENT_IOT_EXPLORER_PATH := $(TOP)/amaziot_bloom_os_sdk/platforms/tencent/qcloud_iot_c_sdk
+TENCENT_IOT_EXPLORER_PATH := $(TOP)/amaziot_bloom_os_sdk/third_party/tencent/qcloud_iot_c_sdk
 
 ifneq (${BUILD_VARIANT}, )
 CSDK_LIB_FILE += build\CSDK_CODE.lib

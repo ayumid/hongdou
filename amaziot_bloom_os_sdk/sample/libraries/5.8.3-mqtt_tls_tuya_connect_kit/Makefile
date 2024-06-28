@@ -15,7 +15,7 @@ CSDK_OBJ_FILES :=
 CSDK_OBJ_PATH := 
 CSDK_LIB_FILE := 
 
-TUYA_CONNECT_KIT_PATH := $(TOP)/amaziot_bloom_os_sdk/platforms/tuya/tuya-connect-kit
+TUYA_CONNECT_KIT_PATH := $(TOP)/amaziot_bloom_os_sdk/third_party/tuya/tuya-connect-kit
 
 ifneq (${BUILD_VARIANT}, )
 CSDK_LIB_FILE += build\CSDK_CODE.lib

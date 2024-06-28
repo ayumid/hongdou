@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Copyright , 2017-2023 Ææ¼£ÎïÁª£¨±±¾©£©¿Æ¼¼ÓĞÏŞ¹«Ë¾
+// Copyright , 2017-2023 å¥‡è¿¹ç‰©è”ï¼ˆåŒ—äº¬ï¼‰ç§‘æŠ€æœ‰é™å…¬å¸
 // Filename    : drv_ssd1315_oled.h
 // Auther      : zhaoning
 // Version     :
@@ -33,7 +33,7 @@ extern "C" {
 
 // Public defines / typedefs ----------------------------------------------------
 
-//-----------------OLED¶Ë¿Ú¶¨Òå---------------- 
+//-----------------OLEDç«¯å£å®šä¹‰---------------- 
 #define DRV_SSD1315_SPI_CS                  17//PIN 31 PCM_SYNC
 #define DRV_SSD1315_SPI_SDA                 50//PIN 65 SDA
 #define DRV_SSD1315_SPI_SCL                 49//PIN 48 SCL
@@ -58,8 +58,8 @@ extern "C" {
 #define DRV_SSD1315_CS_CLR()  GpioSetLevel(DRV_SSD1315_SPI_CS, DRV_ST7735S_GPIO_LOW)//CS
 #define DRV_SSD1315_CS_SET()  GpioSetLevel(DRV_SSD1315_SPI_CS, DRV_ST7735S_GPIO_HIGH)
 
-#define DRV_SSD1315_OLED_CMD  0//Ğ´ÃüÁî
-#define DRV_SSD1315_OLED_DATA 1//Ğ´Êı¾İ
+#define DRV_SSD1315_OLED_CMD  0//å†™å‘½ä»¤
+#define DRV_SSD1315_OLED_DATA 1//å†™æ•°æ®
 
 // Public functions prototypes --------------------------------------------------
 

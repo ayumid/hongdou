@@ -23,7 +23,7 @@ endif
 $(shell mkdir $(CSDK_OBJ_PATH))
 #=====================CSDK_CODE end========================#
 
-COMMON_CFLAGS += -I$(CURDIR)\am\inc
+COMMON_CFLAGS += -I$(CURDIR)
 COMMON_CFLAGS += -I$(CURDIR)\atcmds\inc
 COMMON_CFLAGS += -I$(TOP)/amaziot_bloom_os_sdk/libraries\am\xtu
 COMMON_CFLAGS +=  -DDTU_BASED_ON_TCP
@@ -31,8 +31,9 @@ COMMON_CFLAGS +=  -DDTU_TYPE_5X6
 COMMON_CFLAGS +=  -DDTU_UART_115200_BAUD
 COMMON_CFLAGS +=  -DDTU_TYPE_MODBUS_INCLUDE
 COMMON_CFLAGS +=  -DDTU_TYPE_JSON_INCLUDE
-COMMON_CFLAGS += -I$(TOP)/amaziot_bloom_os_sdk/libraries/third_party/agile_modbus-1.1.3\inc
-COMMON_CFLAGS += -I$(TOP)/amaziot_bloom_os_sdk/libraries/third_party/agile_modbus-1.1.3\util
+COMMON_CFLAGS +=  -DDTU_TYPE_CJSON_INCLUDE
+COMMON_CFLAGS += -I$(TOP)/amaziot_bloom_os_sdk/third_party/modbus/agile_modbus-1.1.3\inc
+COMMON_CFLAGS += -I$(TOP)/amaziot_bloom_os_sdk/third_party/modbus/agile_modbus-1.1.3\util
 
 OBJ_PATH := build\obj
 
@@ -48,10 +49,10 @@ SOURCE_FILES := $(CURDIR)/main.c \
 				$(TOP)/amaziot_bloom_os_sdk/libraries/am/xtu/am_json.c \
 				$(TOP)/amaziot_bloom_os_sdk/libraries/am/xtu/am_modbus.c \
 				$(TOP)/amaziot_bloom_os_sdk/utils/utils_string.c \
-				$(TOP)/amaziot_bloom_os_sdk/libraries/third_party/agile_modbus-1.1.3/util/agile_modbus_slave_util.c \
-				$(TOP)/amaziot_bloom_os_sdk/libraries/third_party/agile_modbus-1.1.3/src/agile_modbus.c \
-				$(TOP)/amaziot_bloom_os_sdk/libraries/third_party/agile_modbus-1.1.3/src/agile_modbus_rtu.c \
-				$(TOP)/amaziot_bloom_os_sdk/libraries/third_party/agile_modbus-1.1.3/src/agile_modbus_tcp.c
+				$(TOP)/amaziot_bloom_os_sdk/third_party/modbus/agile_modbus-1.1.3/util/agile_modbus_slave_util.c \
+				$(TOP)/amaziot_bloom_os_sdk/third_party/modbus/agile_modbus-1.1.3/src/agile_modbus.c \
+				$(TOP)/amaziot_bloom_os_sdk/third_party/modbus/agile_modbus-1.1.3/src/agile_modbus_rtu.c \
+				$(TOP)/amaziot_bloom_os_sdk/third_party/modbus/agile_modbus-1.1.3/src/agile_modbus_tcp.c
 				
 OBJ_FILES := $(patsubst %.c,$(OBJ_PATH)/%.o, $(notdir $(SOURCE_FILES)))
 

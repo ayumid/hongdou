@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Copyright , 2017-2023 Ææ¼£ÎïÁª£¨±±¾©£©¿Æ¼¼ÓĞÏŞ¹«Ë¾
+// Copyright , 2017-2023 å¥‡è¿¹ç‰©è”ï¼ˆåŒ—äº¬ï¼‰ç§‘æŠ€æœ‰é™å…¬å¸
 // Filename    : drv_ssd1315_oled.c
 // Auther      : zhaoning
 // Version     :
@@ -39,7 +39,7 @@ static UINT8 OLED_GRAM[144][8];
 
 /**
   * Function    : drv_ssd1315_delay_ms
-  * Description : ÑÓÊ± ms
+  * Description : å»¶æ—¶ ms
   * Input       : 
   *               
   * Output      : 
@@ -54,8 +54,8 @@ void drv_ssd1315_delay_ms(unsigned int ms)
 
 /**
   * Function    : drv_ssd1315_color_turn
-  * Description : ·´ÏÔº¯Êı
-  * Input       : i ÏÔÊ¾¿ØÖÆ
+  * Description : åæ˜¾å‡½æ•°
+  * Input       : i æ˜¾ç¤ºæ§åˆ¶
   *               
   * Output      : 
   * Return      : 
@@ -66,18 +66,18 @@ void drv_ssd1315_color_turn(UINT8 i)
 {
     if(i==0)
         {
-            drv_ssd1315_wr_byte(0xA6,DRV_SSD1315_OLED_CMD);//Õı³£ÏÔÊ¾
+            drv_ssd1315_wr_byte(0xA6,DRV_SSD1315_OLED_CMD);//æ­£å¸¸æ˜¾ç¤º
         }
     if(i==1)
         {
-            drv_ssd1315_wr_byte(0xA7,DRV_SSD1315_OLED_CMD);//·´É«ÏÔÊ¾
+            drv_ssd1315_wr_byte(0xA7,DRV_SSD1315_OLED_CMD);//åè‰²æ˜¾ç¤º
         }
 }
 
 /**
   * Function    : drv_ssd1315_display_turn
-  * Description : ÆÁÄ»Ğı×ª180¶È
-  * Input       : i ÏÔÊ¾¿ØÖÆ
+  * Description : å±å¹•æ—‹è½¬180åº¦
+  * Input       : i æ˜¾ç¤ºæ§åˆ¶
   *               
   * Output      : 
   * Return      : 
@@ -88,21 +88,21 @@ void drv_ssd1315_display_turn(UINT8 i)
 {
     if(i==0)
         {
-            drv_ssd1315_wr_byte(0xC8,DRV_SSD1315_OLED_CMD);//Õı³£ÏÔÊ¾
+            drv_ssd1315_wr_byte(0xC8,DRV_SSD1315_OLED_CMD);//æ­£å¸¸æ˜¾ç¤º
             drv_ssd1315_wr_byte(0xA1,DRV_SSD1315_OLED_CMD);
         }
     if(i==1)
         {
-            drv_ssd1315_wr_byte(0xC0,DRV_SSD1315_OLED_CMD);//·´×ªÏÔÊ¾
+            drv_ssd1315_wr_byte(0xC0,DRV_SSD1315_OLED_CMD);//åè½¬æ˜¾ç¤º
             drv_ssd1315_wr_byte(0xA0,DRV_SSD1315_OLED_CMD);
         }
 }
 
 /**
   * Function    : drv_ssd1315_wr_byte
-  * Description : Ğ´byte
-  * Input       : dat Êı¾İ
-  *               cmd ÃüÁî
+  * Description : å†™byte
+  * Input       : dat æ•°æ®
+  *               cmd å‘½ä»¤
   * Output      : 
   * Return      : 
   * Auther      : zhaoning
@@ -132,7 +132,7 @@ void drv_ssd1315_wr_byte(UINT8 dat,UINT8 cmd)
 
 /**
   * Function    : drv_ssd1315_display_on
-  * Description : ¿ªÆôOLEDÏÔÊ¾ 
+  * Description : å¼€å¯OLEDæ˜¾ç¤º 
   * Input       : 
   *               
   * Output      : 
@@ -142,14 +142,14 @@ void drv_ssd1315_wr_byte(UINT8 dat,UINT8 cmd)
   **/
 void drv_ssd1315_display_on(void)
 {
-    drv_ssd1315_wr_byte(0x8D,DRV_SSD1315_OLED_CMD);//µçºÉ±ÃÊ¹ÄÜ
-    drv_ssd1315_wr_byte(0x14,DRV_SSD1315_OLED_CMD);//¿ªÆôµçºÉ±Ã
-    drv_ssd1315_wr_byte(0xAF,DRV_SSD1315_OLED_CMD);//µãÁÁÆÁÄ»
+    drv_ssd1315_wr_byte(0x8D,DRV_SSD1315_OLED_CMD);//ç”µè·æ³µä½¿èƒ½
+    drv_ssd1315_wr_byte(0x14,DRV_SSD1315_OLED_CMD);//å¼€å¯ç”µè·æ³µ
+    drv_ssd1315_wr_byte(0xAF,DRV_SSD1315_OLED_CMD);//ç‚¹äº®å±å¹•
 }
 
 /**
   * Function    : drv_ssd1315_display_off
-  * Description : ¹Ø±ÕOLEDÏÔÊ¾ 
+  * Description : å…³é—­OLEDæ˜¾ç¤º 
   * Input       : 
   *               
   * Output      : 
@@ -159,14 +159,14 @@ void drv_ssd1315_display_on(void)
   **/
 void drv_ssd1315_display_off(void)
 {
-    drv_ssd1315_wr_byte(0x8D,DRV_SSD1315_OLED_CMD);//µçºÉ±ÃÊ¹ÄÜ
-    drv_ssd1315_wr_byte(0x10,DRV_SSD1315_OLED_CMD);//¹Ø±ÕµçºÉ±Ã
-    drv_ssd1315_wr_byte(0xAE,DRV_SSD1315_OLED_CMD);//¹Ø±ÕÆÁÄ»
+    drv_ssd1315_wr_byte(0x8D,DRV_SSD1315_OLED_CMD);//ç”µè·æ³µä½¿èƒ½
+    drv_ssd1315_wr_byte(0x10,DRV_SSD1315_OLED_CMD);//å…³é—­ç”µè·æ³µ
+    drv_ssd1315_wr_byte(0xAE,DRV_SSD1315_OLED_CMD);//å…³é—­å±å¹•
 }
 
 /**
   * Function    : drv_ssd1315_refresh
-  * Description : ¸üĞÂÏÔ´æµ½OLED
+  * Description : æ›´æ–°æ˜¾å­˜åˆ°OLED
   * Input       : 
   *               
   * Output      : 
@@ -179,9 +179,9 @@ void drv_ssd1315_refresh(void)
     UINT8 i,n;
     for(i=0;i<8;i++)
     {
-       drv_ssd1315_wr_byte(0xb0+i,DRV_SSD1315_OLED_CMD); //ÉèÖÃĞĞÆğÊ¼µØÖ·
-       drv_ssd1315_wr_byte(0x00,DRV_SSD1315_OLED_CMD);   //ÉèÖÃµÍÁĞÆğÊ¼µØÖ·
-       drv_ssd1315_wr_byte(0x10,DRV_SSD1315_OLED_CMD);   //ÉèÖÃ¸ßÁĞÆğÊ¼µØÖ·
+       drv_ssd1315_wr_byte(0xb0+i,DRV_SSD1315_OLED_CMD); //è®¾ç½®è¡Œèµ·å§‹åœ°å€
+       drv_ssd1315_wr_byte(0x00,DRV_SSD1315_OLED_CMD);   //è®¾ç½®ä½åˆ—èµ·å§‹åœ°å€
+       drv_ssd1315_wr_byte(0x10,DRV_SSD1315_OLED_CMD);   //è®¾ç½®é«˜åˆ—èµ·å§‹åœ°å€
        for(n=0;n<128;n++)
          drv_ssd1315_wr_byte(OLED_GRAM[n][i],DRV_SSD1315_OLED_DATA);
   }
@@ -189,7 +189,7 @@ void drv_ssd1315_refresh(void)
 
 /**
   * Function    : drv_ssd1315_clear
-  * Description : ÇåÆÁº¯Êı
+  * Description : æ¸…å±å‡½æ•°
   * Input       : 
   *               
   * Output      : 
@@ -204,17 +204,17 @@ void drv_ssd1315_clear(void)
     {
        for(n=0;n<128;n++)
             {
-             OLED_GRAM[n][i]=0;//Çå³ıËùÓĞÊı¾İ
+             OLED_GRAM[n][i]=0;//æ¸…é™¤æ‰€æœ‰æ•°æ®
             }
   }
-    drv_ssd1315_refresh();//¸üĞÂÏÔÊ¾
+    drv_ssd1315_refresh();//æ›´æ–°æ˜¾ç¤º
 }
 
 /**
   * Function    : drv_ssd1315_draw_point
-  * Description : »­µã 
+  * Description : ç”»ç‚¹ 
   * Input       : x:0~127
-  *               t:1 Ìî³ä 0,Çå¿Õ    
+  *               t:1 å¡«å…… 0,æ¸…ç©º    
   * Output      : 
   * Return      : 
   * Auther      : zhaoning
@@ -237,9 +237,9 @@ void drv_ssd1315_draw_point(UINT8 x,UINT8 y,UINT8 t)
 
 /**
   * Function    : drv_ssd1315_draw_line
-  * Description : »­Ïß
-  * Input       : x1,y1:Æğµã×ø±ê
-  *               x2,y2:½áÊø×ø±ê
+  * Description : ç”»çº¿
+  * Input       : x1,y1:èµ·ç‚¹åæ ‡
+  *               x2,y2:ç»“æŸåæ ‡
   * Output      : 
   * Return      : 
   * Auther      : zhaoning
@@ -250,21 +250,21 @@ void drv_ssd1315_draw_line(UINT8 x1,UINT8 y1,UINT8 x2,UINT8 y2,UINT8 mode)
     UINT16 t; 
     int xerr=0,yerr=0,delta_x,delta_y,distance;
     int incx,incy,uRow,uCol;
-    delta_x=x2-x1; //¼ÆËã×ø±êÔöÁ¿ 
+    delta_x=x2-x1; //è®¡ç®—åæ ‡å¢é‡ 
     delta_y=y2-y1;
-    uRow=x1;//»­ÏßÆğµã×ø±ê
+    uRow=x1;//ç”»çº¿èµ·ç‚¹åæ ‡
     uCol=y1;
-    if(delta_x>0)incx=1; //ÉèÖÃµ¥²½·½Ïò 
-    else if (delta_x==0)incx=0;//´¹Ö±Ïß 
+    if(delta_x>0)incx=1; //è®¾ç½®å•æ­¥æ–¹å‘ 
+    else if (delta_x==0)incx=0;//å‚ç›´çº¿ 
     else {incx=-1;delta_x=-delta_x;}
     if(delta_y>0)incy=1;
-    else if (delta_y==0)incy=0;//Ë®Æ½Ïß 
+    else if (delta_y==0)incy=0;//æ°´å¹³çº¿ 
     else {incy=-1;delta_y=-delta_x;}
-    if(delta_x>delta_y)distance=delta_x; //Ñ¡È¡»ù±¾ÔöÁ¿×ø±êÖá 
+    if(delta_x>delta_y)distance=delta_x; //é€‰å–åŸºæœ¬å¢é‡åæ ‡è½´ 
     else distance=delta_y;
     for(t=0;t<distance+1;t++)
     {
-        drv_ssd1315_draw_point(uRow,uCol,mode);//»­µã
+        drv_ssd1315_draw_point(uRow,uCol,mode);//ç”»ç‚¹
         xerr+=delta_x;
         yerr+=delta_y;
         if(xerr>distance)
@@ -282,9 +282,9 @@ void drv_ssd1315_draw_line(UINT8 x1,UINT8 y1,UINT8 x2,UINT8 y2,UINT8 mode)
 
 /**
   * Function    : drv_ssd1315_draw_circle
-  * Description : »­Ô²
-  * Input       : x,y:Ô²ĞÄ×ø±ê
-  *               r:Ô²µÄ°ë¾¶
+  * Description : ç”»åœ†
+  * Input       : x,y:åœ†å¿ƒåæ ‡
+  *               r:åœ†çš„åŠå¾„
   * Output      : 
   * Return      : 
   * Auther      : zhaoning
@@ -308,7 +308,7 @@ void drv_ssd1315_draw_circle(UINT8 x,UINT8 y,UINT8 r)
         drv_ssd1315_draw_point(x - b, y + a,1);
         
         a++;
-        num = (a * a + b * b) - r*r;//¼ÆËã»­µÄµãÀëÔ²ĞÄµÄ¾àÀë
+        num = (a * a + b * b) - r*r;//è®¡ç®—ç”»çš„ç‚¹ç¦»åœ†å¿ƒçš„è·ç¦»
         if(num > 0)
         {
             b--;
@@ -319,11 +319,11 @@ void drv_ssd1315_draw_circle(UINT8 x,UINT8 y,UINT8 r)
 
 /**
   * Function    : drv_ssd1315_show_char
-  * Description : ÔÚÖ¸¶¨Î»ÖÃÏÔÊ¾Ò»¸ö×Ö·û,°üÀ¨²¿·Ö×Ö·û
+  * Description : åœ¨æŒ‡å®šä½ç½®æ˜¾ç¤ºä¸€ä¸ªå­—ç¬¦,åŒ…æ‹¬éƒ¨åˆ†å­—ç¬¦
   * Input       : x:0~127
   *               y:0~63
-  *               size1:Ñ¡Ôñ×ÖÌå 6x8/6x12/8x16/12x24
-  *               mode:0,·´É«ÏÔÊ¾;1,Õı³£ÏÔÊ¾
+  *               size1:é€‰æ‹©å­—ä½“ 6x8/6x12/8x16/12x24
+  *               mode:0,åè‰²æ˜¾ç¤º;1,æ­£å¸¸æ˜¾ç¤º
   * Output      : 
   * Return      : 
   * Auther      : zhaoning
@@ -334,18 +334,18 @@ void drv_ssd1315_show_char(UINT8 x,UINT8 y,UINT8 chr,UINT8 size1,UINT8 mode)
     UINT8 i,m,temp,size2,chr1;
     UINT8 x0=x,y0=y;
     if(size1==8)size2=6;
-    else size2=(size1/8+((size1%8)?1:0))*(size1/2);  //µÃµ½×ÖÌåÒ»¸ö×Ö·û¶ÔÓ¦µãÕó¼¯ËùÕ¼µÄ×Ö½ÚÊı
-    chr1=chr-' ';  //¼ÆËãÆ«ÒÆºóµÄÖµ
+    else size2=(size1/8+((size1%8)?1:0))*(size1/2);  //å¾—åˆ°å­—ä½“ä¸€ä¸ªå­—ç¬¦å¯¹åº”ç‚¹é˜µé›†æ‰€å çš„å­—èŠ‚æ•°
+    chr1=chr-' ';  //è®¡ç®—åç§»åçš„å€¼
     for(i=0;i<size2;i++)
     {
         if(size1==8)
-              {temp=asc2_0806[chr1][i];} //µ÷ÓÃ0806×ÖÌå
+              {temp=asc2_0806[chr1][i];} //è°ƒç”¨0806å­—ä½“
         else if(size1==12)
-        {temp=asc2_1206[chr1][i];} //µ÷ÓÃ1206×ÖÌå
+        {temp=asc2_1206[chr1][i];} //è°ƒç”¨1206å­—ä½“
         else if(size1==16)
-        {temp=asc2_1608[chr1][i];} //µ÷ÓÃ1608×ÖÌå
+        {temp=asc2_1608[chr1][i];} //è°ƒç”¨1608å­—ä½“
         else if(size1==24)
-        {temp=asc2_2412[chr1][i];} //µ÷ÓÃ2412×ÖÌå
+        {temp=asc2_2412[chr1][i];} //è°ƒç”¨2412å­—ä½“
         else return;
         for(m=0;m<8;m++)
         {
@@ -363,11 +363,11 @@ void drv_ssd1315_show_char(UINT8 x,UINT8 y,UINT8 chr,UINT8 size1,UINT8 mode)
 
 /**
   * Function    : drv_ssd1315_show_string
-  * Description : ÏÔÊ¾×Ö·û´®
-  * Input       : x,y:Æğµã×ø±ê  
-  *               size1:×ÖÌå´óĞ¡ 
-  *               *chr:×Ö·û´®ÆğÊ¼µØÖ· 
-  *               mode:0,·´É«ÏÔÊ¾;1,Õı³£ÏÔÊ¾
+  * Description : æ˜¾ç¤ºå­—ç¬¦ä¸²
+  * Input       : x,y:èµ·ç‚¹åæ ‡  
+  *               size1:å­—ä½“å¤§å° 
+  *               *chr:å­—ç¬¦ä¸²èµ·å§‹åœ°å€ 
+  *               mode:0,åè‰²æ˜¾ç¤º;1,æ­£å¸¸æ˜¾ç¤º
   * Output      : 
   * Return      : 
   * Auther      : zhaoning
@@ -375,7 +375,7 @@ void drv_ssd1315_show_char(UINT8 x,UINT8 y,UINT8 chr,UINT8 size1,UINT8 mode)
   **/
 void drv_ssd1315_show_string(UINT8 x,UINT8 y,UINT8 *chr,UINT8 size1,UINT8 mode)
 {
-    while((*chr>=' ')&&(*chr<='~'))//ÅĞ¶ÏÊÇ²»ÊÇ·Ç·¨×Ö·û!
+    while((*chr>=' ')&&(*chr<='~'))//åˆ¤æ–­æ˜¯ä¸æ˜¯éæ³•å­—ç¬¦!
     {
         drv_ssd1315_show_char(x,y,*chr,size1,mode);
         if(size1==8)x+=6;
@@ -386,8 +386,8 @@ void drv_ssd1315_show_string(UINT8 x,UINT8 y,UINT8 *chr,UINT8 size1,UINT8 mode)
 
 /**
   * Function    : drv_ssd1315_pow
-  * Description : ÏÔÊ¾Êı×Ö
-  * Input       : mµ×Êı£¬nÖ¸Êı
+  * Description : æ˜¾ç¤ºæ•°å­—
+  * Input       : måº•æ•°ï¼ŒnæŒ‡æ•°
   *               
   * Output      : 
   * Return      : 
@@ -406,12 +406,12 @@ UINT32 drv_ssd1315_pow(UINT8 m,UINT8 n)
 
 /**
   * Function    : drv_ssd1315_show_num
-  * Description : ÏÔÊ¾Êı×Ö
-  * Input       : x,y :Æğµã×ø±ê
-  *               num :ÒªÏÔÊ¾µÄÊı×Ö
-  *               len :Êı×ÖµÄÎ»Êı
-  *               size:×ÖÌå´óĞ¡
-  *               mode:0,·´É«ÏÔÊ¾;1,Õı³£ÏÔÊ¾
+  * Description : æ˜¾ç¤ºæ•°å­—
+  * Input       : x,y :èµ·ç‚¹åæ ‡
+  *               num :è¦æ˜¾ç¤ºçš„æ•°å­—
+  *               len :æ•°å­—çš„ä½æ•°
+  *               size:å­—ä½“å¤§å°
+  *               mode:0,åè‰²æ˜¾ç¤º;1,æ­£å¸¸æ˜¾ç¤º
   * Output      : 
   * Return      : 
   * Auther      : zhaoning
@@ -437,10 +437,10 @@ void drv_ssd1315_show_num(UINT8 x,UINT8 y,UINT32 num,UINT8 len,UINT8 size1,UINT8
 
 /**
   * Function    : drv_ssd1315_show_chinese
-  * Description : ÏÔÊ¾ºº×Ö
-  * Input       : x,y:Æğµã×ø±ê
-  *               num:ºº×Ö¶ÔÓ¦µÄĞòºÅ
-  *               mode:0,·´É«ÏÔÊ¾;1,Õı³£ÏÔÊ¾
+  * Description : æ˜¾ç¤ºæ±‰å­—
+  * Input       : x,y:èµ·ç‚¹åæ ‡
+  *               num:æ±‰å­—å¯¹åº”çš„åºå·
+  *               mode:0,åè‰²æ˜¾ç¤º;1,æ­£å¸¸æ˜¾ç¤º
   * Output      : 
   * Return      : 
   * Auther      : zhaoning
@@ -450,17 +450,17 @@ void drv_ssd1315_show_chinese(UINT8 x,UINT8 y,UINT8 num,UINT8 size1,UINT8 mode)
 {
     UINT8 m,temp;
     UINT8 x0=x,y0=y;
-    UINT16 i,size3=(size1/8+((size1%8)?1:0))*size1;  //µÃµ½×ÖÌåÒ»¸ö×Ö·û¶ÔÓ¦µãÕó¼¯ËùÕ¼µÄ×Ö½ÚÊı
+    UINT16 i,size3=(size1/8+((size1%8)?1:0))*size1;  //å¾—åˆ°å­—ä½“ä¸€ä¸ªå­—ç¬¦å¯¹åº”ç‚¹é˜µé›†æ‰€å çš„å­—èŠ‚æ•°
     for(i=0;i<size3;i++)
     {
         if(size1==16)
-                {temp=Hzk1[num][i];}//µ÷ÓÃ16*16×ÖÌå
+                {temp=Hzk1[num][i];}//è°ƒç”¨16*16å­—ä½“
         else if(size1==24)
-                {temp=Hzk2[num][i];}//µ÷ÓÃ24*24×ÖÌå
+                {temp=Hzk2[num][i];}//è°ƒç”¨24*24å­—ä½“
         else if(size1==32)       
-                {temp=Hzk3[num][i];}//µ÷ÓÃ32*32×ÖÌå
+                {temp=Hzk3[num][i];}//è°ƒç”¨32*32å­—ä½“
         else if(size1==64)
-                {temp=Hzk4[num][i];}//µ÷ÓÃ64*64×ÖÌå
+                {temp=Hzk4[num][i];}//è°ƒç”¨64*64å­—ä½“
         else return;
         for(m=0;m<8;m++)
         {
@@ -478,10 +478,10 @@ void drv_ssd1315_show_chinese(UINT8 x,UINT8 y,UINT8 num,UINT8 size1,UINT8 mode)
 
 /**
   * Function    : drv_ssd1315_scroll_display
-  * Description : ¹ö¶¯ÏÔÊ¾ºº×Ö
-  * Input       : num ÏÔÊ¾ºº×ÖµÄ¸öÊı
-  *               space Ã¿Ò»±éÏÔÊ¾µÄ¼ä¸ô
-  *               mode:0,·´É«ÏÔÊ¾;1,Õı³£ÏÔÊ¾
+  * Description : æ»šåŠ¨æ˜¾ç¤ºæ±‰å­—
+  * Input       : num æ˜¾ç¤ºæ±‰å­—çš„ä¸ªæ•°
+  *               space æ¯ä¸€éæ˜¾ç¤ºçš„é—´éš”
+  *               mode:0,åè‰²æ˜¾ç¤º;1,æ­£å¸¸æ˜¾ç¤º
   * Output      : 
   * Return      : 
   * Auther      : zhaoning
@@ -494,12 +494,12 @@ void drv_ssd1315_scroll_display(UINT8 num,UINT8 space,UINT8 mode)
     {
         if(m==0)
         {
-            drv_ssd1315_show_chinese(128,24,t,16,mode); //Ğ´ÈëÒ»¸öºº×Ö±£´æÔÚOLED_GRAM[][]Êı×éÖĞ
+            drv_ssd1315_show_chinese(128,24,t,16,mode); //å†™å…¥ä¸€ä¸ªæ±‰å­—ä¿å­˜åœ¨OLED_GRAM[][]æ•°ç»„ä¸­
             t++;
         }
         if(t==num)
         {
-            for(r=0;r<16*space;r++)      //ÏÔÊ¾¼ä¸ô
+            for(r=0;r<16*space;r++)      //æ˜¾ç¤ºé—´éš”
             {
                 for(i=1;i<144;i++)
                 {
@@ -514,7 +514,7 @@ void drv_ssd1315_scroll_display(UINT8 num,UINT8 space,UINT8 mode)
         }
         m++;
         if(m==16){m=0;}
-        for(i=1;i<144;i++)   //ÊµÏÖ×óÒÆ
+        for(i=1;i<144;i++)   //å®ç°å·¦ç§»
         {
             for(n=0;n<8;n++)
             {
@@ -527,11 +527,11 @@ void drv_ssd1315_scroll_display(UINT8 num,UINT8 space,UINT8 mode)
 
 /**
   * Function    : drv_ssd1315_show_picture
-  * Description : ÏÔÊ¾Í¼Æ¬
-  * Input       : x,y£ºÆğµã×ø±ê
-  *               sizex,sizey,Í¼Æ¬³¤¿í
-  *               BMP[]£ºÒªĞ´ÈëµÄÍ¼Æ¬Êı×é
-  *               mode:0,·´É«ÏÔÊ¾;1,Õı³£ÏÔÊ¾
+  * Description : æ˜¾ç¤ºå›¾ç‰‡
+  * Input       : x,yï¼šèµ·ç‚¹åæ ‡
+  *               sizex,sizey,å›¾ç‰‡é•¿å®½
+  *               BMP[]ï¼šè¦å†™å…¥çš„å›¾ç‰‡æ•°ç»„
+  *               mode:0,åè‰²æ˜¾ç¤º;1,æ­£å¸¸æ˜¾ç¤º
   * Output      : 
   * Return      : 
   * Auther      : zhaoning
@@ -568,7 +568,7 @@ void drv_ssd1315_show_picture(UINT8 x,UINT8 y,UINT8 sizex,UINT8 sizey,UINT8 BMP[
 }
 /**
   * Function    : drv_st7735s_gpio_init
-  * Description : ³õÊ¼»¯gpio
+  * Description : åˆå§‹åŒ–gpio
   * Input       : 
   *               
   * Output      : 
@@ -581,7 +581,7 @@ void drv_st7735s_gpio_init(void)
     GPIOReturnCode status = GPIORC_OK;
     GPIOConfiguration config = {0};
 
-    //³õÊ¼»¯ CS CLK MOSI
+    //åˆå§‹åŒ– CS CLK MOSI
     status = GpioSetDirection(DRV_SSD1315_SPI_CS, GPIO_OUT_PIN);
     if (status != GPIORC_OK)
     {
@@ -610,7 +610,7 @@ void drv_st7735s_gpio_init(void)
 
     }
 
-    //ÉèÖÃÎª¸ßµçÆ½
+    //è®¾ç½®ä¸ºé«˜ç”µå¹³
     GpioSetLevel(DRV_SSD1315_SPI_CS, DRV_ST7735S_GPIO_HIGH);
     GpioSetLevel(DRV_SSD1315_SPI_SDA, DRV_ST7735S_GPIO_HIGH);
     GpioSetLevel(DRV_SSD1315_SPI_SCL, DRV_ST7735S_GPIO_HIGH);
@@ -621,7 +621,7 @@ void drv_st7735s_gpio_init(void)
 
 /**
   * Function    : drv_ssd1315_init
-  * Description : OLEDµÄ³õÊ¼»¯
+  * Description : OLEDçš„åˆå§‹åŒ–
   * Input       : 
   *               
   * Output      : 
@@ -643,8 +643,8 @@ void drv_ssd1315_init(void)
     drv_ssd1315_wr_byte(0x40,DRV_SSD1315_OLED_CMD);//--set start line address  Set Mapping RAM Display Start Line (0x00~0x3F)
     drv_ssd1315_wr_byte(0x81,DRV_SSD1315_OLED_CMD);//--set contrast control register
     drv_ssd1315_wr_byte(0xCF,DRV_SSD1315_OLED_CMD);// Set SEG Output Current Brightness
-    drv_ssd1315_wr_byte(0xA1,DRV_SSD1315_OLED_CMD);//--Set SEG/Column Mapping     0xa0×óÓÒ·´ÖÃ 0xa1Õı³£
-    drv_ssd1315_wr_byte(0xC8,DRV_SSD1315_OLED_CMD);//Set COM/Row Scan Direction   0xc0ÉÏÏÂ·´ÖÃ 0xc8Õı³£
+    drv_ssd1315_wr_byte(0xA1,DRV_SSD1315_OLED_CMD);//--Set SEG/Column Mapping     0xa0å·¦å³åç½® 0xa1æ­£å¸¸
+    drv_ssd1315_wr_byte(0xC8,DRV_SSD1315_OLED_CMD);//Set COM/Row Scan Direction   0xc0ä¸Šä¸‹åç½® 0xc8æ­£å¸¸
     drv_ssd1315_wr_byte(0xA6,DRV_SSD1315_OLED_CMD);//--set normal display
     drv_ssd1315_wr_byte(0xA8,DRV_SSD1315_OLED_CMD);//--set multiplex ratio(1 to 64)
     drv_ssd1315_wr_byte(0x3f,DRV_SSD1315_OLED_CMD);//--1/64 duty

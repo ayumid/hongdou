@@ -41,6 +41,12 @@
 
 #define SAMPLE_SIM_STACK_SIZE            0x2000
 
+#define DTU_TYPE_EXSIM//插拔卡，定义这个宏；贴片5x6卡，贴片三合一卡，不要定义这个宏
+
+#ifndef DTU_TYPE_EXSIM
+extern UINT32 SDK_INIT_SIM_SELECT_VALUE;
+#endif
+
 // Private variables ------------------------------------------------------------
 
 static void* sample_sim_task_stack = NULL;
@@ -80,6 +86,11 @@ extern void Phase2Inits_exit(void);
 void Phase1Inits_enter(void)
 {    
     SDK_SET_HOSCFG_CONFIG(1,1);    // 在这个接口中初始化热插拔配置，启用热插拔，高电平检测
+
+#ifndef DTU_TYPE_EXSIM
+    //使用SIM2
+    SDK_INIT_SIM_SELECT_VALUE = 2;
+#endif
 }
 
 void Phase1Inits_exit(void)
@@ -137,7 +148,7 @@ static void sample_sim_task(void *ptr)
         current_os_ticks = OSAGetTicks();    // 获取系统tick ,一个tick 5ms，即开机时间    
         sample_sim_uart_printf("this is a test task current_os_ticks %d\n", current_os_ticks);
         OSATaskSleep(200*3);        // 如果可能存在while空跑的case，一定需要加上个sleep，不然可能会造成系统调度异常
-        
+        //硬件设计上，插拔卡使用了模组的SIM1卡接口；贴片5×6卡和贴片三合一卡，使用的是模组的SIM2卡接口。可以参考amaziot_bloom_os_sdk\products\am-xtu\dtu_rtu\main.c中对全局变量SDK_INIT_SIM_SELECT_VALUE的使用。SDK_INIT_SIM_SELECT_VALUE = 1；表示使用SIM1卡接口。（默认为1，使用SIM1卡接口，可以不用设置）SDK_INIT_SIM_SELECT_VALUE = 2：表示使用SIM2卡接口。
         simStatus = SDK_GetSimStatus();
         sample_sim_uart_printf("SDK_GetSimStatus simStatus %d\n", simStatus);
         if (simStatus == CI_SIM_PIN_ST_READY){

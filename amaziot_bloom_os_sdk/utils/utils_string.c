@@ -685,6 +685,103 @@ double utils_get_distance_between_A2B_by_haversine(double lata,double loga, doub
     return distance;
 }
 #endif
-// End of file : utils.c 2021-7-19 9:58:50 by: zhaoning 
 
+/**
+  * Function    : utils_gnss_nmea_comma_pos
+  * Description : 寻找第num个逗号
+  * Input       : addr    待寻找的字符串
+  *               num    第num个逗号
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+u8 utils_gnss_nmea_comma_pos(char* addr,u8 num)
+{
+    char *p = addr;
+    
+    while(num)
+    {
+        if(*p == '*' || *p < ' ' || *p > 'z')
+            return 0XFF;//遇到'*'或者非法字符,则不存在第cx个逗号
+        if(*p==',')
+            num--;
+        p++;
+    }
+    return p - addr;
+}
+
+/**
+  * Function    : utils_gnss_nmea_analysis
+  * Description : 获取经纬度等信息
+  * Input       : buf    传入GNRMC语句
+  *               
+  * Output      : st_gnss    存放解析后数据的结构体缓冲区，由调用函数提供
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+u32 utils_gnss_nmea_analysis(char* buf, UTILS_GNSS_STANDARD_T* st_gnss)
+{
+    u32 ul_ret = INCL_ERR_SUCCESS;
+    char* p_gnrmc = NULL;
+//#ifdef APP_DEV_GNSS_NUM_USED
+//    char* p_gsv = NULL;
+//#endif /* ifdef APP_DEV_GNSS_NUM_USED.2022-9-15 10:46:48 by: zhaoning */
+    char* addr = NULL;
+    u8 uc_pos0 = 0;
+    u8 uc_pos1 = 0;
+
+    p_gnrmc = strstr(buf, "$GNRMC");
+//#ifdef APP_DEV_GNSS_NUM_USED
+//    p_gsv = strstr(buf, "$GPGSV");
+//#endif /* ifdef APP_DEV_GNSS_NUM_USED.2022-9-15 10:48:03 by: zhaoning */
+//#ifdef APP_DEV_GNSS_NUM_USED
+//    if(p_gsv != NULL)
+//    {
+//        memset(st_gnss->gsv, 0, 512);
+//        memcpy(st_gnss->gsv, p_gsv, p_gnrmc - p_gsv);
+//        utils_printf("[GNSS] gsv: %s\n", st_gnss->gsv);
+//    }
+//#endif /* ifdef APP_DEV_GNSS_NUM_USED.2022-9-15 10:48:44 by: zhaoning */
+    if(p_gnrmc != NULL)
+    {
+        //$GNRMC,062548.000,A,3803.74716,N,11430.31281,E,0.00,0.00,250821,,,A,V*0E
+        addr = memchr(p_gnrmc,'A',25);
+        if(addr != NULL)
+        {
+            uc_pos0 = utils_gnss_nmea_comma_pos(addr, 1);
+            uc_pos1 = utils_gnss_nmea_comma_pos(addr, 2);
+            memcpy(st_gnss->latitude, addr + uc_pos0, uc_pos1 - uc_pos0 - 1);
+
+            uc_pos0 = utils_gnss_nmea_comma_pos(addr, 3);
+            uc_pos1 = utils_gnss_nmea_comma_pos(addr, 4);
+            memcpy(st_gnss->longtitude, addr + uc_pos0, uc_pos1 - uc_pos0 - 1);
+
+            uc_pos0 = utils_gnss_nmea_comma_pos(addr, 5);
+            uc_pos1 = utils_gnss_nmea_comma_pos(addr, 6);
+            memcpy(st_gnss->speed, addr + uc_pos0, uc_pos1 - uc_pos0 - 1);
+
+            uc_pos0 = utils_gnss_nmea_comma_pos(addr, 6);
+            uc_pos1 = utils_gnss_nmea_comma_pos(addr, 7);
+            memcpy(st_gnss->angle, addr + uc_pos0, uc_pos1 - uc_pos0 - 1);
+            
+//            utils_printf("[GNSS] la: %s lo: %s speed: %s angle: %s\n", gst_app_gnss.latitude, gst_app_gnss.longtitude,
+//                                                                       gst_app_gnss.speed, gst_app_gnss.angle);
+            
+        }
+        else
+        {
+            ul_ret = INCL_ERR_GNSS_INVALID_ERR;
+        }
+    }
+    else
+    {
+        ul_ret = INCL_ERR_GNSS_INVALID_ERR;
+    }
+    
+    return ul_ret;
+}
+
+// End of file : utils.c 2021-7-19 9:58:50 by: zhaoning 
 

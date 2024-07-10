@@ -34,6 +34,24 @@ extern "C" {
 #define                 ASCIISTR2HEX_MODE_LITTLE_ENDIAN_16         2
 #define                 ASCIISTR2HEX_MODE_BIG_ENDIAN_16            3
 
+#define             INCL_ERR_SUCCESS                         (0)
+
+#define             INCL_ERR_GNSS_INVALID_ERR                (300)
+
+typedef struct UTILS_GNSS_STANDARD_S_
+{    
+    char latitude[15];
+    char longtitude[15];
+    char speed[8];
+    char angle[8];
+    u32 ul_times;
+    u32 ul_delay;
+//#ifdef APP_DEV_GNSS_NUM_USED
+//    char gsv[512];
+//#endif /* ifdef APP_DEV_GNSS_NUM_USED.2022-9-15 10:50:06 by: zhaoning */
+//    u32 ul_agps;
+}UTILS_GNSS_STANDARD_T;
+
 // Public functions prototypes --------------------------------------------------
 
 //void utils_utc_2_localtime(UINT8* p_buffer);

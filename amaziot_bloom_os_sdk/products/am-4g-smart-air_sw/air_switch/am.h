@@ -361,7 +361,7 @@ typedef struct
 }DTU_CLK_PARAM;
 #endif /* ifdef DTU_TYPE_DODIAI_INCLUDE.2023-10-27 11:38:38 by: zhaoning */
 
-#ifdef DTU_TYPE_MODBUS_INCLUDE
+#ifdef DTU_TYPE_485_INCLUDE
 #define DTU_MODBUS_POOLLING_STATE                0//modbus 普通指令轮训状态 01H 02H 03H 04H 05H 06H
 #define DTU_MODBUS_POOLLING_WN_STATE             1//modbus 写多个寄存器指令轮训状态 0FH 10H
 
@@ -559,7 +559,7 @@ typedef struct
     DTU_CLK_PARAM clk;//时钟相关参数
 #endif /* ifdef DTU_TYPE_DODIAI_INCLUDE.2023-10-27 11:38:52 by: zhaoning */
 
-#ifdef DTU_TYPE_MODBUS_INCLUDE
+#ifdef DTU_TYPE_485_INCLUDE
     DTU_MODBUS_PARAM modbus;//modbus相关参数
 #endif /* ifdef DTU_TYPE_MODBUS_INCLUDE.2023-10-10 10:29:42 by: zhaoning */
     
@@ -753,7 +753,7 @@ void dtu_clk_json_set_clk_config(int len , char *rcvdata);
 
 void dtu_ota_json_set_ota_config(int len , char *rcvdata);
 
-#ifdef DTU_TYPE_MODBUS_INCLUDE
+#ifdef DTU_TYPE_485_INCLUDE
 void dtu_modbus_send_flag(void);
 void dtu_modbus_task_init(void);
 int dtu_modbus_task_send_msgq(DTU_MSG_UART_DATA_PARAM_T * msg);

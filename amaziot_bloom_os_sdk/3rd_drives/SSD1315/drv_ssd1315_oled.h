@@ -32,13 +32,21 @@ extern "C" {
 #include "bsp.h"
 
 // Public defines / typedefs ----------------------------------------------------
+//是否使用DC引脚
+//#define DRV_SSD1315_USED_DC_PIN
 
 //-----------------OLED端口定义---------------- 
 #define DRV_SSD1315_SPI_CS                  17//PIN 31 PCM_SYNC
-#define DRV_SSD1315_SPI_SDA                 50//PIN 65 SDA
-#define DRV_SSD1315_SPI_SCL                 49//PIN 48 SCL
+#define DRV_SSD1315_SPI_SDA                 18//PIN 65 SDA
+#define DRV_SSD1315_SPI_SCL                 16//PIN 48 SCL
 #define DRV_SSD1315_SPI_DC                  19//PIN 32 PCM_IN
-#define DRV_SSD1315_SPI_RES                 18//PIN 33 PCM_OUT
+#define DRV_SSD1315_SPI_RES                 26//PIN 33 PCM_OUT
+
+//#define DRV_SSD1315_SPI_CS                  17//PIN 31 PCM_SYNC
+//#define DRV_SSD1315_SPI_SDA                 50//PIN 65 SDA
+//#define DRV_SSD1315_SPI_SCL                 49//PIN 48 SCL
+//#define DRV_SSD1315_SPI_DC                  19//PIN 32 PCM_IN
+//#define DRV_SSD1315_SPI_RES                 18//PIN 33 PCM_OUT
 
 #define DRV_ST7735S_GPIO_HIGH               1
 #define DRV_ST7735S_GPIO_LOW                0
@@ -82,6 +90,7 @@ void drv_ssd1315_show_chinese(UINT8 x,UINT8 y,UINT8 num,UINT8 size1,UINT8 mode);
 void drv_ssd1315_scroll_display(UINT8 num,UINT8 space,UINT8 mode);
 void drv_ssd1315_show_picture(UINT8 x,UINT8 y,UINT8 sizex,UINT8 sizey,UINT8 BMP[],UINT8 mode);
 void drv_ssd1315_init(void);
+    void OLED_WriteData(uint8_t *Data, uint8_t Count);
 
 #ifdef __cplusplus
 }

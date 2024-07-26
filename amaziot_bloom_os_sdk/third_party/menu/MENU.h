@@ -1,26 +1,49 @@
-#ifndef __MENU_H
-#define __MENU_H
+//------------------------------------------------------------------------------
+// Copyright , 2017-2023 奇迹物联（北京）科技有限公司
+// Filename    : MENU.h
+// Auther      : zhaoning
+// Version     :
+// Date : 2024-7-3
+// Description :
+//          
+//          
+// History     :
+//     
+//    1. Time         :  2024-7-3
+//       Modificator  : zhaoning
+//       Modification : Created
+//    2.
+// Others :
+//------------------------------------------------------------------------------
+// Define to prevent recursive inclusion ----------------------------------------
+#ifndef _MENU_H_
+#define _MENU_H_
 
-#ifndef NULL
-#define NULL ((void *)0)
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#include <stdint.h>
+// Includes ---------------------------------------------------------------------
 
-enum _MENU_StrVarType // 选项字符串附带的变量的数据类型枚举
+#include <stdint.h>
+#include"sdk_api.h"
+
+// Public defines / typedefs ----------------------------------------------------
+
+enum _MENU_STR_VAR_S // 选项字符串附带的变量的数据类型枚举
 {
-    INT8 = 0,
-    UINT8,
-    INT16,
-    UINT16,
-    INT32,
-    UINT32,
-    STRING,
-    CHAR,
-    FLOAT,
+    OLED_INT8 = 0,
+    OLED_UINT8,
+    OLED_INT16,
+    OLED_UINT16,
+    OLED_INT32,
+    OLED_UINT32,
+    OLED_STRING,
+    OLED_CHAR,
+    OLED_FLOAT,
 };
 
-enum _menu_command
+enum _MENU_CMD_S
 {
     BUFFER_DISPLAY, // 无参无返
     BUFFER_CLEAR,   // 无参无返
@@ -33,18 +56,18 @@ enum _menu_command
     GET_EVENT_WHEEL, // 返回有符号整型
 };
 
-typedef struct _MENU_OptionTypeDef // 选项结构体
+typedef struct _MENU_OPTION_TYPE_S // 选项结构体
 {
     char *String;                     // 选项字符串
     void (*func)(void);               // 函数指针
     void *StrVarPointer;              // 附带变量 的指针
-    enum _MENU_StrVarType StrVarType; // 附带变量 的类型
+    enum _MENU_STR_VAR_S StrVarType; // 附带变量 的类型
     uint8_t StrLen;                   // 字符串长度
-} MENU_OptionTypeDef;
+} MENU_OPTION_TYPE_T;
 
-typedef struct _MENU_HandleTypeDef // 选项结构体
+typedef struct _MENU_HANDLE_TYPE_S // 选项结构体
 {
-    MENU_OptionTypeDef *OptionList; // 选项列表指针
+    MENU_OPTION_TYPE_T *OptionList; // 选项列表指针
 
     int16_t Catch_i;              // 选中下标
     int16_t Cursor_i;             // 光标下标
@@ -57,9 +80,8 @@ typedef struct _MENU_HandleTypeDef // 选项结构体
     uint8_t isInitialized;        // 已初始化标志
     // uint8_t isPlayingAnimation; // 正在播放动画标志
 
-} MENU_HandleTypeDef;
+} MENU_HANDLE_TYPE_T;
 
-/**********************************************************/
 /* 宏函数 */
 
 #define COORD_CHANGE_SIZE(sta, end) (((end) - (sta)) + 1)   // 坐标转换成尺寸 COORD_CHANGE_SIZE
@@ -71,26 +93,26 @@ typedef struct _MENU_HandleTypeDef // 选项结构体
      : (((target) - (actual)) < -(0.0625)) ? ((actual) - (0.0625) + (((target) - (actual)) * (step_size)))                     \
                                            : ((target)))
 
-/**********************************************************/
-/* driver */
+// Public functions prototypes --------------------------------------------------
 
-int menu_command_callback(enum _menu_command command, ...);
-void MENU_RunMenu(MENU_HandleTypeDef *hMENU);
-void MENU_HandleInit(MENU_HandleTypeDef *hMENU);
-void MENU_Event_and_Action(MENU_HandleTypeDef *hMENU);
-void MENU_UpdateIndex(MENU_HandleTypeDef *hMENU);
-void MENU_ShowOptionList(MENU_HandleTypeDef *hMENU);
-uint8_t MENU_ShowOption(int16_t X, int16_t Y, MENU_OptionTypeDef *Option);
-void MENU_ShowCursor(MENU_HandleTypeDef *hMENU);
-void MENU_ShowBorder(MENU_HandleTypeDef *hMENU);
-
-/**********************************************************/
-/* use */
-
-void MENU_RunMainMenu(void);
-void MENU_RunToolsMenu(void);
-void MENU_RunGamesMenu(void);
-void MENU_Information(void);
-
-/**********************************************************/
+#ifdef __cplusplus
+}
 #endif
+
+int menu_command_callback(enum _MENU_CMD_S command, ...);
+void menu_run_menu(MENU_HANDLE_TYPE_T *hMENU);
+void menu_handle_init(MENU_HANDLE_TYPE_T *hMENU);
+void menu_event_and_action(MENU_HANDLE_TYPE_T *hMENU);
+void menu_updata_idx(MENU_HANDLE_TYPE_T *hMENU);
+void menu_show_option_list(MENU_HANDLE_TYPE_T *hMENU);
+uint8_t menu_show_option(int16_t X, int16_t Y, MENU_OPTION_TYPE_T *Option);
+void menu_show_cursor(MENU_HANDLE_TYPE_T *hMENU);
+void menu_show_border(MENU_HANDLE_TYPE_T *hMENU);
+void menu_run_main_menu(void);
+void menu_run_tools_menu(void);
+void menu_run_games_menu(void);
+void menu_run_info_menu(void);
+void menu_display_menu(MENU_HANDLE_TYPE_T *hMENU);
+
+#endif /* ifndef _MENU_H_.2024-7-3 12:03:08 by: zhaoning */
+

@@ -1,0 +1,52 @@
+/*****************************************************************
+* Function: UART_INIT_VOLT
+*
+* Description:
+* 	该函数用于设置UART接口的IO的初始电平,只能在Phase1Inits_enter接口中初始化，初始化后无需再调用UART_SET_VOLT。
+* 
+* Parameters:
+* 	voltType	  	[In] 	0: 1.8V, 1: 2.8V, 2: 3.3V;
+* Return:
+* 	NONE
+*
+*****************************************************************/
+
+void UART_INIT_VOLT(int voltType);
+/*****************************************************************
+* Function: UART_SET_VOLT
+*
+* Description:
+* 	该函数用于设置UART接口的IO电平,立即生效。
+* 
+* Parameters:
+* 	voltType	  	[In] 	0: 1.8V, 1: 2.8V, 2: 3.3V;
+* Return:
+* 	NONE
+*
+*****************************************************************/
+void UART_SET_VOLT(int voltType);
+
+
+/*****************************************************************
+* Function: UART_GET_VOLT
+*
+* Description:
+* 	该函数用于读取当前UART接口IO电平的类型。
+* 
+* Parameters:
+* 	NONE
+* Return:
+* 	0: 1.8V;
+* 	1: 2.8V;
+* 	2: 3.3V;
+*
+*****************************************************************/
+int UART_GET_VOLT(void);
+
+
+
+备注：
+1、使用UART_SET_VOLT切换IO电平时，GPIO27、GPIO31、GPIO51、GPIO52、GPIO53、GPIO54，这些GPIO的电平会一起改变。
+2、MV9 UART3接口使用时会默认初始化GPIO14、GPIO15为UART3，如果需要使用两路3.3V串口接口的话，可以修改GPIO53和GPIO54作为UART3的RX TX
+3、LV9 UART3接口使用时会默认初始化GPIO53、GPIO54为UART3，电平调整的是时候，UART和UART3两路UART同时修改
+

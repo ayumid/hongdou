@@ -696,7 +696,7 @@ double utils_get_distance_between_A2B_by_haversine(double lata,double loga, doub
   * Auther      : zhaoning
   * Others      : 
   **/
-u8 utils_gnss_nmea_comma_pos(char* addr,u8 num)
+UINT8 utils_gnss_nmea_comma_pos(char* addr,UINT8 num)
 {
     char *p = addr;
     
@@ -721,16 +721,16 @@ u8 utils_gnss_nmea_comma_pos(char* addr,u8 num)
   * Auther      : zhaoning
   * Others      : 
   **/
-u32 utils_gnss_nmea_analysis(char* buf, UTILS_GNSS_STANDARD_T* st_gnss)
+UINT32 utils_gnss_nmea_analysis(char* buf, UTILS_GNSS_STANDARD_T* st_gnss)
 {
-    u32 ul_ret = INCL_ERR_SUCCESS;
+    UINT32 ul_ret = INCL_ERR_SUCCESS;
     char* p_gnrmc = NULL;
 //#ifdef APP_DEV_GNSS_NUM_USED
 //    char* p_gsv = NULL;
 //#endif /* ifdef APP_DEV_GNSS_NUM_USED.2022-9-15 10:46:48 by: zhaoning */
     char* addr = NULL;
-    u8 uc_pos0 = 0;
-    u8 uc_pos1 = 0;
+    UINT8 uc_pos0 = 0;
+    UINT8 uc_pos1 = 0;
 
     p_gnrmc = strstr(buf, "$GNRMC");
 //#ifdef APP_DEV_GNSS_NUM_USED
@@ -766,8 +766,8 @@ u32 utils_gnss_nmea_analysis(char* buf, UTILS_GNSS_STANDARD_T* st_gnss)
             uc_pos1 = utils_gnss_nmea_comma_pos(addr, 7);
             memcpy(st_gnss->angle, addr + uc_pos0, uc_pos1 - uc_pos0 - 1);
             
-//            utils_printf("[GNSS] la: %s lo: %s speed: %s angle: %s\n", gst_app_gnss.latitude, gst_app_gnss.longtitude,
-//                                                                       gst_app_gnss.speed, gst_app_gnss.angle);
+//            uprintf("[GNSS] la: %s lo: %s speed: %s angle: %s\n", st_gnss->latitude, st_gnss->longtitude,
+//                                                                       st_gnss->speed, st_gnss->angle);
             
         }
         else

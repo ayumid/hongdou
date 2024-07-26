@@ -434,7 +434,10 @@ void dtu_uart4_data_send_thread(void *param)
     DTU_MSG_UART_DATA_PARAM_T uart4_sdata = {0};
     OSA_STATUS osa_status = 0;
     DTU_UART_PARAM_T* dtu_uart_ctx = NULL;
-
+#ifdef GNSS_ANALYSIS
+    UTILS_GNSS_STANDARD_T st_gnss = {0};
+    char* p_gnrmc = NULL;
+#endif /* ifdef GNSS_ANALYSIS.2024-7-11 9:39:09 by: zhaoning */
     dtu_uart_ctx = dtu_get_uart_ctx();
 
     uart4_sdata.id = DTU_UART4_MSG_ID_INIT;
@@ -450,7 +453,7 @@ void dtu_uart4_data_send_thread(void *param)
         status = OSAMsgQRecv(dtu_uart_ctx->dtu_msgq_uart4, (UINT8 *)&uart4_rdata, sizeof(DTU_MSG_UART_DATA_PARAM_T), OSA_SUSPEND);    //recv data from uart
         if (status == OS_SUCCESS)
         {
-//            uprintf("%s: id:%d\n", __FUNCTION__, uart4_data.id);
+            uprintf("%s: id:%d\n", __FUNCTION__, uart4_rdata.id);
             //为了安全，等当前线程刚开始运行后，在给gnss芯片上电，接收串口4数据
             if(DTU_UART4_MSG_ID_INIT == uart4_rdata.id)
             {
@@ -466,8 +469,16 @@ void dtu_uart4_data_send_thread(void *param)
             {
                 if(NULL != uart4_rdata.UArgs)
                 {
-//                    uprintf("%s: len:%d, data:%s\n", __FUNCTION__, uart4_rdata.len, (char *)(uart4_rdata.UArgs));
+                    uprintf("%s: len:%d, data:%s\n", __FUNCTION__, uart4_rdata.len, (char *)(uart4_rdata.UArgs));
                     dtu_gnss_data_prase(uart4_rdata.UArgs, uart4_rdata.len);
+#ifdef GNSS_ANALYSIS
+                    p_gnrmc = &dtu_gnss_nmea_t.a_nmea_gnrmc[0];
+                    uprintf("%s", p_gnrmc);
+                    if(NULL != p_gnrmc)
+                    {
+                        utils_gnss_nmea_analysis(p_gnrmc, &st_gnss);
+                    }
+#endif /* ifdef GNSS_ANALYSIS.2024-7-11 9:38:38 by: zhaoning */
                     free(uart4_rdata.UArgs);
                     uart4_rdata.UArgs = NULL;
                 }

@@ -44,8 +44,8 @@ typedef struct UTILS_GNSS_STANDARD_S_
     char longtitude[15];
     char speed[8];
     char angle[8];
-    u32 ul_times;
-    u32 ul_delay;
+    UINT32 ul_times;
+    UINT32 ul_delay;
 //#ifdef APP_DEV_GNSS_NUM_USED
 //    char gsv[512];
 //#endif /* ifdef APP_DEV_GNSS_NUM_USED.2022-9-15 10:50:06 by: zhaoning */

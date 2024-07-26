@@ -108,6 +108,7 @@ void drv_ssd1315_display_turn(UINT8 i)
   * Auther      : zhaoning
   * Others      : 
   **/
+#ifdef DRV_SSD1315_USED_DC_PIN
 void drv_ssd1315_wr_byte(UINT8 dat,UINT8 cmd)
 {    
     UINT8 i;              
@@ -129,6 +130,35 @@ void drv_ssd1315_wr_byte(UINT8 dat,UINT8 cmd)
     DRV_SSD1315_CS_SET();
     DRV_SSD1315_DC_SET();         
 }
+#else
+void drv_ssd1315_wr_byte(UINT8 dat,UINT8 cmd)
+{    
+    UINT8 i = 0;
+
+    DRV_SSD1315_CS_CLR();
+    DRV_SSD1315_SCL_CLR();
+    if(DRV_SSD1315_OLED_CMD == cmd)
+    {
+        DRV_SSD1315_SDA_CLR();
+    }
+    else
+    {
+        DRV_SSD1315_SDA_SET();
+    }
+    DRV_SSD1315_SCL_SET();
+    for(i=0;i<8;i++)
+    {              
+        DRV_SSD1315_SCL_CLR();
+        if(dat&0x80)
+           DRV_SSD1315_SDA_SET();
+        else 
+           DRV_SSD1315_SDA_CLR();
+        DRV_SSD1315_SCL_SET();
+        dat<<=1;   
+    }
+    DRV_SSD1315_CS_SET();
+}
+#endif /* ifdef DRV_SSD1315_USED_DC_PIN.2024-7-18 10:00:56 by: zhaoning */
 
 /**
   * Function    : drv_ssd1315_display_on
@@ -567,7 +597,7 @@ void drv_ssd1315_show_picture(UINT8 x,UINT8 y,UINT8 sizex,UINT8 sizey,UINT8 BMP[
      }
 }
 /**
-  * Function    : drv_st7735s_gpio_init
+  * Function    : drv_ssd1315_gpio_init
   * Description : 初始化gpio
   * Input       : 
   *               
@@ -576,7 +606,7 @@ void drv_ssd1315_show_picture(UINT8 x,UINT8 y,UINT8 sizex,UINT8 sizey,UINT8 BMP[
   * Auther      : zhaoning
   * Others      : 
   **/
-void drv_st7735s_gpio_init(void)
+void drv_ssd1315_gpio_init(void)
 {
     GPIOReturnCode status = GPIORC_OK;
     GPIOConfiguration config = {0};
@@ -616,6 +646,21 @@ void drv_st7735s_gpio_init(void)
     GpioSetLevel(DRV_SSD1315_SPI_SCL, DRV_ST7735S_GPIO_HIGH);
     GpioSetLevel(DRV_SSD1315_SPI_DC, DRV_ST7735S_GPIO_HIGH);
     GpioSetLevel(DRV_SSD1315_SPI_RES, DRV_ST7735S_GPIO_HIGH);
+//    while(1)
+//    {
+//        GpioSetLevel(DRV_SSD1315_SPI_CS, DRV_ST7735S_GPIO_HIGH);
+//        GpioSetLevel(DRV_SSD1315_SPI_SDA, DRV_ST7735S_GPIO_HIGH);
+//        GpioSetLevel(DRV_SSD1315_SPI_SCL, DRV_ST7735S_GPIO_HIGH);
+//        GpioSetLevel(DRV_SSD1315_SPI_DC, DRV_ST7735S_GPIO_HIGH);
+//        GpioSetLevel(DRV_SSD1315_SPI_RES, DRV_ST7735S_GPIO_HIGH);
+//        drv_ssd1315_delay_ms(1000);
+//        GpioSetLevel(DRV_SSD1315_SPI_CS, DRV_ST7735S_GPIO_LOW);
+//        GpioSetLevel(DRV_SSD1315_SPI_SDA, DRV_ST7735S_GPIO_LOW);
+//        GpioSetLevel(DRV_SSD1315_SPI_SCL, DRV_ST7735S_GPIO_LOW);
+//        GpioSetLevel(DRV_SSD1315_SPI_DC, DRV_ST7735S_GPIO_LOW);
+//        GpioSetLevel(DRV_SSD1315_SPI_RES, DRV_ST7735S_GPIO_LOW);
+//        drv_ssd1315_delay_ms(1000);
+//    }
 
 }
 
@@ -631,10 +676,12 @@ void drv_st7735s_gpio_init(void)
   **/
 void drv_ssd1315_init(void)
 {
-    drv_st7735s_gpio_init();
-    
+    drv_ssd1315_gpio_init();
+
+    DRV_SSD1315_RES_SET();
+    drv_ssd1315_delay_ms(1000);
     DRV_SSD1315_RES_CLR();
-    drv_ssd1315_delay_ms(200);
+    drv_ssd1315_delay_ms(1000);
     DRV_SSD1315_RES_SET();
     
     drv_ssd1315_wr_byte(0xAE,DRV_SSD1315_OLED_CMD);//--turn off oled panel

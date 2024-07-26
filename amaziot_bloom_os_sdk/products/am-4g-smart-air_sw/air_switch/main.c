@@ -129,6 +129,8 @@ void Phase2Inits_exit(void)
     //初始化sim卡
     dtu_trans_sim_init();
 #endif
+    //初始化OLED任务
+    air_sw_task_init();
     //初始化led灯控制io
     dtu_trans_net_led_init();  
     //初始化AT 透传串口
@@ -139,41 +141,20 @@ void Phase2Inits_exit(void)
     dtu_trans_task_init();
     //输出型号到AT串口
     dtu_version_to_at_uart();
-    
-#ifdef DTU_TYPE_GNSS_INCLUDE
-    //初始化gnss任务
-    dtu_gnss_task_init();
-#endif
 
 #ifdef DTU_BASED_ON_TCP
     //初始化TCP任务
     dtu_sokcet_task_init();
 #endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 16:44:19 by: zhaoning */
 
-#ifdef DTU_TYPE_DODIAI_INCLUDE
-    //初始化DI上报定时器
-    dtu_di_times_init();
-    //初始化DI对应GPIO，按照NV来配置DI模式
-    dtu_di_int_init_all();
-    //初始化DO上报定时器
-    dtu_do_times_init();
-    //初始化DO对应GPIO，按照NV来配置DI模式
-    dtu_do_init();
-    //初始化AI上报定时器
-    dtu_ai_times_init();
-//    dtu_ai1_report_timer_start(dtu_file_ctx->ai.ai_interval);
-    //初始化闹钟定时器
-    dtu_clk_times_init();
-#endif /* ifdef DTU_TYPE_DODIAI_INCLUDE.2023-10-27 11:43:25 by: zhaoning */
-
 #ifdef DTU_TYPE_JSON_INCLUDE
     //初始化和服务器之间json通信任务
     dtu_json_task_init();
 #endif /* ifdef DTU_TYPE_CJSON_INCLUDE.2023-10-30 18:33:25 by: zhaoning */
     
-#ifdef DTU_TYPE_MODBUS_INCLUDE
+#ifdef DTU_TYPE_485_INCLUDE
     //初始化modbus任务
-    dtu_modbus_task_init();
+    dtu_485_task_init();
 #endif /* ifdef DTU_TYPE_MODBUS_INCLUDE.2023-10-10 10:30:49 by: zhaoning */
 
 #ifdef DTU_TYPE_HTTP_INCLUDE

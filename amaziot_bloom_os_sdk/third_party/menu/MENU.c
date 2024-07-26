@@ -1,85 +1,804 @@
-/* *********************************************************
- * 多级菜单v2.0
- * 作者:Adam
- *
- * 移植方法
- *
- * 1. 配置菜单宏定义, 兼容不同显示器及布局, 例如:
-    #define MENU_WIDTH 128 // 菜单宽度
-    #define MENU_HEIGHT 64 // 菜单高度
-    #define MENU_LINE_H 20 // 行高
+//------------------------------------------------------------------------------
+// Copyright , 2017-2023 奇迹物联（北京）科技有限公司
+// Filename    : menu.c
+// Auther      : zhaoning
+// Version     :
+// Date : 2024-7-3
+// Description :
+//          
+//          
+// History     :
+//     
+//    1. Time         :  2024-7-3
+//       Modificator  : zhaoning
+//       Modification : Created
+//    2.
+// Others :
+//------------------------------------------------------------------------------
 
- * 2. 实现 menu_command_callback() 对应的指令功能以完成移植, 有些指令是有参数的, 参数已经提取好, 按需使用参数即可,
- *    详情可看CSDN博客:https://blog.csdn.net/AdminAdam/article/details/138232161
+// Includes ---------------------------------------------------------------------
 
- * 使用方法
- *
- * 1. 创建选项列表,并直接初始化, 每个选项对应其名字和功能(功能为函数指针, 直接填写函数名), 例如:
-    static MENU_OptionTypeDef MENU_OptionList[] = {
-        {"<<<", NULL},                     // 固定格式, 用于退出
-        {"Tools", MENU_RunToolsMenu},      // 工具
-        {"Games", MENU_RunGamesMenu},      // 游戏
-        {"Setting", MENU_RunSettingMenu},  // 设置
-        {"Information", MENU_Information}, // 信息
-        {"..", NULL},                      // 固定格式, 用于计算选项列表长度和退出
-    };
-
- * 2. 创建菜单句柄 并把菜单句柄内的选项列表指针指向 第1 步创建的选项列表, 例如
-    static MENU_HandleTypeDef MENU = {.OptionList = MENU_OptionList};
-
- * 3. 调用 MENU_RunMenu() 运行菜单, 参数为菜单句柄
-    MENU_RunMenu(&MENU);
- *
- * 4. 为了实现多级菜单, 可使用一个函数来封装 第 1 2 3 步, 封装好的函数可作为功能被其他菜单调用, 以此实现不限层级多级菜单, 此文件底部提供了示例代码
- *    例如 void MENU_RunToolsMenu(void) 被选项 {"Tools", MENU_RunToolsMenu} 调用;
- *
- *
- * 视频教程:https://www.bilibili.com/video/BV1Y94y1g7mu?p=2
- * CSDN博客:https://blog.csdn.net/AdminAdam/article/details/138232161
- *
- * 下载链接
- * 百度网盘:https://pan.baidu.com/s/1bZPWCKaiNbb-l1gpAv6QNg?pwd=KYWS
- * Gitee: https://gitee.com/AdamLoong/Embedded_Menu_Simple
- * GitHub:https://github.com/AdamLoong/Embedded_Menu_Simple
- *
- * B站UP:加油哦大灰狼
- * 如果此程序对你有帮助记得给个一键三连哦! ( •̀ ω •́ )✧
- ********************************************************* */
-
-#include "MENU.h"
+#include "menu.h"
 #include "stdio.h"
+#include "drv_ssd1315_oled.h"
+#include "stdarg.h"
+#include "menu_front.h"
+#include "utils_common.h"
+
+// Private defines / typedefs ---------------------------------------------------
 
 /* 配置菜单 */
+//是否显示边框，边框相关参数
+#define MENU_BORDER 1         // 边框线条尺寸
 #define MENU_X 0       // 菜单位置X
 #define MENU_Y 0       // 菜单位置Y
 #define MENU_WIDTH 128 // 菜单宽度
 #define MENU_HEIGHT 64 // 菜单高度
 
-#define MENU_LINE_H 20 // 行高
-#define MENU_PADDING 2 // 内边距
-#define MENU_MARGIN 2  // 外边距
-
+//字体相关
 #define MENU_FONT_W 8  // 字体宽度
 #define MENU_FONT_H 16 // 字体高度
 
-#define MENU_BORDER 1         // 边框线条尺寸
+//光标相关，设置光标高度
+#define MENU_LINE_H 20 // 行高
+#define MENU_PADDING 2 // 内边距
+#define MENU_MARGIN 2  // 外边距
+#define CURSOR_CEILING (((MENU_HEIGHT - MENU_MARGIN - MENU_MARGIN) / MENU_LINE_H) - 1) // 光标限位
+
+//果冻动画相关
 #define IS_CENTERED 1         // 是否居中
-#define IS_OVERSHOOT 1        // 是否过冲 (果冻效果)
+#define IS_OVERSHOOT 0        // 是否过冲 (果冻效果)
 #define OVERSHOOT 0.321       // 过冲量 0 < 范围 < 1;
 #define ANIMATION_SPEED 0.321 // 动画速度 0 < 范围 <= 1;
 
-#define CURSOR_CEILING (((MENU_HEIGHT - MENU_MARGIN - MENU_MARGIN) / MENU_LINE_H) - 1) // 光标限位
+/*FontSize参数取值*/
+/*此参数值不仅用于判断，而且用于计算横向字符偏移，默认值为字体像素宽度*/
+#define OLED_8X16                   8
+#define OLED_6X8                    6
 
-/** Port 移植接口 * **************************************************************/
-/* 依赖头文件 */
-#include "Key.h"
-#include "OLED.h"
+/*ASCII字模数据*********************/
+/*宽8像素，高16像素*/
+const uint8_t OLED_F8x16[][16] =
+{
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,//   0
+    0x00,0x00,0x00,0xF8,0x00,0x00,0x00,0x00,
+    0x00,0x00,0x00,0x33,0x30,0x00,0x00,0x00,// ! 1
+    0x00,0x16,0x0E,0x00,0x16,0x0E,0x00,0x00,
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,// " 2
+    0x40,0xC0,0x78,0x40,0xC0,0x78,0x40,0x00,
+    0x04,0x3F,0x04,0x04,0x3F,0x04,0x04,0x00,// # 3
+    0x00,0x70,0x88,0xFC,0x08,0x30,0x00,0x00,
+    0x00,0x18,0x20,0xFF,0x21,0x1E,0x00,0x00,// $ 4
+    0xF0,0x08,0xF0,0x00,0xE0,0x18,0x00,0x00,
+    0x00,0x21,0x1C,0x03,0x1E,0x21,0x1E,0x00,// % 5
+    0x00,0xF0,0x08,0x88,0x70,0x00,0x00,0x00,
+    0x1E,0x21,0x23,0x24,0x19,0x27,0x21,0x10,// & 6
+    0x00,0x00,0x00,0x16,0x0E,0x00,0x00,0x00,
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,// ' 7
+    0x00,0x00,0x00,0xE0,0x18,0x04,0x02,0x00,
+    0x00,0x00,0x00,0x07,0x18,0x20,0x40,0x00,// ( 8
+    0x00,0x02,0x04,0x18,0xE0,0x00,0x00,0x00,
+    0x00,0x40,0x20,0x18,0x07,0x00,0x00,0x00,// ) 9
+    0x40,0x40,0x80,0xF0,0x80,0x40,0x40,0x00,
+    0x02,0x02,0x01,0x0F,0x01,0x02,0x02,0x00,// * 10
+    0x00,0x00,0x00,0xF0,0x00,0x00,0x00,0x00,
+    0x01,0x01,0x01,0x1F,0x01,0x01,0x01,0x00,// + 11
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+    0x00,0xB0,0x70,0x00,0x00,0x00,0x00,0x00,// , 12
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+    0x00,0x01,0x01,0x01,0x01,0x01,0x01,0x01,// - 13
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+    0x00,0x30,0x30,0x00,0x00,0x00,0x00,0x00,// . 14
+    0x00,0x00,0x00,0x00,0x80,0x60,0x18,0x04,
+    0x00,0x60,0x18,0x06,0x01,0x00,0x00,0x00,// / 15
+    0x00,0xE0,0x10,0x08,0x08,0x10,0xE0,0x00,
+    0x00,0x0F,0x10,0x20,0x20,0x10,0x0F,0x00,// 0 16
+    0x00,0x10,0x10,0xF8,0x00,0x00,0x00,0x00,
+    0x00,0x20,0x20,0x3F,0x20,0x20,0x00,0x00,// 1 17
+    0x00,0x70,0x08,0x08,0x08,0x88,0x70,0x00,
+    0x00,0x30,0x28,0x24,0x22,0x21,0x30,0x00,// 2 18
+    0x00,0x30,0x08,0x88,0x88,0x48,0x30,0x00,
+    0x00,0x18,0x20,0x20,0x20,0x11,0x0E,0x00,// 3 19
+    0x00,0x00,0xC0,0x20,0x10,0xF8,0x00,0x00,
+    0x00,0x07,0x04,0x24,0x24,0x3F,0x24,0x00,// 4 20
+    0x00,0xF8,0x08,0x88,0x88,0x08,0x08,0x00,
+    0x00,0x19,0x21,0x20,0x20,0x11,0x0E,0x00,// 5 21
+    0x00,0xE0,0x10,0x88,0x88,0x18,0x00,0x00,
+    0x00,0x0F,0x11,0x20,0x20,0x11,0x0E,0x00,// 6 22
+    0x00,0x38,0x08,0x08,0xC8,0x38,0x08,0x00,
+    0x00,0x00,0x00,0x3F,0x00,0x00,0x00,0x00,// 7 23
+    0x00,0x70,0x88,0x08,0x08,0x88,0x70,0x00,
+    0x00,0x1C,0x22,0x21,0x21,0x22,0x1C,0x00,// 8 24
+    0x00,0xE0,0x10,0x08,0x08,0x10,0xE0,0x00,
+    0x00,0x00,0x31,0x22,0x22,0x11,0x0F,0x00,// 9 25
+    0x00,0x00,0x00,0xC0,0xC0,0x00,0x00,0x00,
+    0x00,0x00,0x00,0x30,0x30,0x00,0x00,0x00,// : 26
+    0x00,0x00,0x00,0xC0,0xC0,0x00,0x00,0x00,
+    0x00,0x00,0x80,0xB0,0x70,0x00,0x00,0x00,// ; 27
+    0x00,0x00,0x80,0x40,0x20,0x10,0x08,0x00,
+    0x00,0x01,0x02,0x04,0x08,0x10,0x20,0x00,// < 28
+    0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x00,
+    0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x00,// = 29
+    0x00,0x08,0x10,0x20,0x40,0x80,0x00,0x00,
+    0x00,0x20,0x10,0x08,0x04,0x02,0x01,0x00,// > 30
+    0x00,0x70,0x48,0x08,0x08,0x08,0xF0,0x00,
+    0x00,0x00,0x00,0x30,0x36,0x01,0x00,0x00,// ? 31
+    0xC0,0x30,0xC8,0x28,0xE8,0x10,0xE0,0x00,
+    0x07,0x18,0x27,0x24,0x23,0x14,0x0B,0x00,// @ 32
+    0x00,0x00,0xC0,0x38,0xE0,0x00,0x00,0x00,
+    0x20,0x3C,0x23,0x02,0x02,0x27,0x38,0x20,// A 33
+    0x08,0xF8,0x88,0x88,0x88,0x70,0x00,0x00,
+    0x20,0x3F,0x20,0x20,0x20,0x11,0x0E,0x00,// B 34
+    0xC0,0x30,0x08,0x08,0x08,0x08,0x38,0x00,
+    0x07,0x18,0x20,0x20,0x20,0x10,0x08,0x00,// C 35
+    0x08,0xF8,0x08,0x08,0x08,0x10,0xE0,0x00,
+    0x20,0x3F,0x20,0x20,0x20,0x10,0x0F,0x00,// D 36
+    0x08,0xF8,0x88,0x88,0xE8,0x08,0x10,0x00,
+    0x20,0x3F,0x20,0x20,0x23,0x20,0x18,0x00,// E 37
+    0x08,0xF8,0x88,0x88,0xE8,0x08,0x10,0x00,
+    0x20,0x3F,0x20,0x00,0x03,0x00,0x00,0x00,// F 38
+    0xC0,0x30,0x08,0x08,0x08,0x38,0x00,0x00,
+    0x07,0x18,0x20,0x20,0x22,0x1E,0x02,0x00,// G 39
+    0x08,0xF8,0x08,0x00,0x00,0x08,0xF8,0x08,
+    0x20,0x3F,0x21,0x01,0x01,0x21,0x3F,0x20,// H 40
+    0x00,0x08,0x08,0xF8,0x08,0x08,0x00,0x00,
+    0x00,0x20,0x20,0x3F,0x20,0x20,0x00,0x00,// I 41
+    0x00,0x00,0x08,0x08,0xF8,0x08,0x08,0x00,
+    0xC0,0x80,0x80,0x80,0x7F,0x00,0x00,0x00,// J 42
+    0x08,0xF8,0x88,0xC0,0x28,0x18,0x08,0x00,
+    0x20,0x3F,0x20,0x01,0x26,0x38,0x20,0x00,// K 43
+    0x08,0xF8,0x08,0x00,0x00,0x00,0x00,0x00,
+    0x20,0x3F,0x20,0x20,0x20,0x20,0x30,0x00,// L 44
+    0x08,0xF8,0xF8,0x00,0xF8,0xF8,0x08,0x00,
+    0x20,0x3F,0x00,0x3F,0x00,0x3F,0x20,0x00,// M 45
+    0x08,0xF8,0x30,0xC0,0x00,0x08,0xF8,0x08,
+    0x20,0x3F,0x20,0x00,0x07,0x18,0x3F,0x00,// N 46
+    0xE0,0x10,0x08,0x08,0x08,0x10,0xE0,0x00,
+    0x0F,0x10,0x20,0x20,0x20,0x10,0x0F,0x00,// O 47
+    0x08,0xF8,0x08,0x08,0x08,0x08,0xF0,0x00,
+    0x20,0x3F,0x21,0x01,0x01,0x01,0x00,0x00,// P 48
+    0xE0,0x10,0x08,0x08,0x08,0x10,0xE0,0x00,
+    0x0F,0x18,0x24,0x24,0x38,0x50,0x4F,0x00,// Q 49
+    0x08,0xF8,0x88,0x88,0x88,0x88,0x70,0x00,
+    0x20,0x3F,0x20,0x00,0x03,0x0C,0x30,0x20,// R 50
+    0x00,0x70,0x88,0x08,0x08,0x08,0x38,0x00,
+    0x00,0x38,0x20,0x21,0x21,0x22,0x1C,0x00,// S 51
+    0x18,0x08,0x08,0xF8,0x08,0x08,0x18,0x00,
+    0x00,0x00,0x20,0x3F,0x20,0x00,0x00,0x00,// T 52
+    0x08,0xF8,0x08,0x00,0x00,0x08,0xF8,0x08,
+    0x00,0x1F,0x20,0x20,0x20,0x20,0x1F,0x00,// U 53
+    0x08,0x78,0x88,0x00,0x00,0xC8,0x38,0x08,
+    0x00,0x00,0x07,0x38,0x0E,0x01,0x00,0x00,// V 54
+    0xF8,0x08,0x00,0xF8,0x00,0x08,0xF8,0x00,
+    0x03,0x3C,0x07,0x00,0x07,0x3C,0x03,0x00,// W 55
+    0x08,0x18,0x68,0x80,0x80,0x68,0x18,0x08,
+    0x20,0x30,0x2C,0x03,0x03,0x2C,0x30,0x20,// X 56
+    0x08,0x38,0xC8,0x00,0xC8,0x38,0x08,0x00,
+    0x00,0x00,0x20,0x3F,0x20,0x00,0x00,0x00,// Y 57
+    0x10,0x08,0x08,0x08,0xC8,0x38,0x08,0x00,
+    0x20,0x38,0x26,0x21,0x20,0x20,0x18,0x00,// Z 58
+    0x00,0x00,0x00,0xFE,0x02,0x02,0x02,0x00,
+    0x00,0x00,0x00,0x7F,0x40,0x40,0x40,0x00,// [ 59
+    0x00,0x0C,0x30,0xC0,0x00,0x00,0x00,0x00,
+    0x00,0x00,0x00,0x01,0x06,0x38,0xC0,0x00,// \ 60
+    0x00,0x02,0x02,0x02,0xFE,0x00,0x00,0x00,
+    0x00,0x40,0x40,0x40,0x7F,0x00,0x00,0x00,// ] 61
+    0x00,0x20,0x10,0x08,0x04,0x08,0x10,0x20,
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,// ^ 62
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+    0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,// _ 63
+    0x00,0x02,0x04,0x08,0x00,0x00,0x00,0x00,
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,// ` 64
+    0x00,0x00,0x80,0x80,0x80,0x80,0x00,0x00,
+    0x00,0x19,0x24,0x22,0x22,0x22,0x3F,0x20,// a 65
+    0x08,0xF8,0x00,0x80,0x80,0x00,0x00,0x00,
+    0x00,0x3F,0x11,0x20,0x20,0x11,0x0E,0x00,// b 66
+    0x00,0x00,0x00,0x80,0x80,0x80,0x00,0x00,
+    0x00,0x0E,0x11,0x20,0x20,0x20,0x11,0x00,// c 67
+    0x00,0x00,0x00,0x80,0x80,0x88,0xF8,0x00,
+    0x00,0x0E,0x11,0x20,0x20,0x10,0x3F,0x20,// d 68
+    0x00,0x00,0x80,0x80,0x80,0x80,0x00,0x00,
+    0x00,0x1F,0x22,0x22,0x22,0x22,0x13,0x00,// e 69
+    0x00,0x80,0x80,0xF0,0x88,0x88,0x88,0x18,
+    0x00,0x20,0x20,0x3F,0x20,0x20,0x00,0x00,// f 70
+    0x00,0x00,0x80,0x80,0x80,0x80,0x80,0x00,
+    0x00,0x6B,0x94,0x94,0x94,0x93,0x60,0x00,// g 71
+    0x08,0xF8,0x00,0x80,0x80,0x80,0x00,0x00,
+    0x20,0x3F,0x21,0x00,0x00,0x20,0x3F,0x20,// h 72
+    0x00,0x80,0x98,0x98,0x00,0x00,0x00,0x00,
+    0x00,0x20,0x20,0x3F,0x20,0x20,0x00,0x00,// i 73
+    0x00,0x00,0x00,0x80,0x98,0x98,0x00,0x00,
+    0x00,0xC0,0x80,0x80,0x80,0x7F,0x00,0x00,// j 74
+    0x08,0xF8,0x00,0x00,0x80,0x80,0x80,0x00,
+    0x20,0x3F,0x24,0x02,0x2D,0x30,0x20,0x00,// k 75
+    0x00,0x08,0x08,0xF8,0x00,0x00,0x00,0x00,
+    0x00,0x20,0x20,0x3F,0x20,0x20,0x00,0x00,// l 76
+    0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x00,
+    0x20,0x3F,0x20,0x00,0x3F,0x20,0x00,0x3F,// m 77
+    0x00,0x80,0x80,0x00,0x80,0x80,0x00,0x00,
+    0x00,0x20,0x3F,0x21,0x00,0x20,0x3F,0x20,// n 78
+    0x00,0x00,0x80,0x80,0x80,0x80,0x00,0x00,
+    0x00,0x1F,0x20,0x20,0x20,0x20,0x1F,0x00,// o 79
+    0x80,0x80,0x00,0x80,0x80,0x00,0x00,0x00,
+    0x80,0xFF,0xA1,0x20,0x20,0x11,0x0E,0x00,// p 80
+    0x00,0x00,0x00,0x80,0x80,0x80,0x80,0x00,
+    0x00,0x0E,0x11,0x20,0x20,0xA0,0xFF,0x80,// q 81
+    0x80,0x80,0x80,0x00,0x80,0x80,0x80,0x00,
+    0x20,0x20,0x3F,0x21,0x20,0x00,0x01,0x00,// r 82
+    0x00,0x00,0x80,0x80,0x80,0x80,0x80,0x00,
+    0x00,0x33,0x24,0x24,0x24,0x24,0x19,0x00,// s 83
+    0x00,0x80,0x80,0xE0,0x80,0x80,0x00,0x00,
+    0x00,0x00,0x00,0x1F,0x20,0x20,0x00,0x00,// t 84
+    0x80,0x80,0x00,0x00,0x00,0x80,0x80,0x00,
+    0x00,0x1F,0x20,0x20,0x20,0x10,0x3F,0x20,// u 85
+    0x80,0x80,0x80,0x00,0x00,0x80,0x80,0x80,
+    0x00,0x01,0x0E,0x30,0x08,0x06,0x01,0x00,// v 86
+    0x80,0x80,0x00,0x80,0x00,0x80,0x80,0x80,
+    0x0F,0x30,0x0C,0x03,0x0C,0x30,0x0F,0x00,// w 87
+    0x00,0x80,0x80,0x00,0x80,0x80,0x80,0x00,
+    0x00,0x20,0x31,0x2E,0x0E,0x31,0x20,0x00,// x 88
+    0x80,0x80,0x80,0x00,0x00,0x80,0x80,0x80,
+    0x80,0x81,0x8E,0x70,0x18,0x06,0x01,0x00,// y 89
+    0x00,0x80,0x80,0x80,0x80,0x80,0x80,0x00,
+    0x00,0x21,0x30,0x2C,0x22,0x21,0x30,0x00,// z 90
+    0x00,0x00,0x00,0x00,0x80,0x7C,0x02,0x02,
+    0x00,0x00,0x00,0x00,0x00,0x3F,0x40,0x40,// { 91
+    0x00,0x00,0x00,0x00,0xFF,0x00,0x00,0x00,
+    0x00,0x00,0x00,0x00,0xFF,0x00,0x00,0x00,// | 92
+    0x00,0x02,0x02,0x7C,0x80,0x00,0x00,0x00,
+    0x00,0x40,0x40,0x3F,0x00,0x00,0x00,0x00,// } 93
+    0x00,0x80,0x40,0x40,0x80,0x00,0x00,0x80,
+    0x00,0x00,0x00,0x00,0x00,0x01,0x01,0x00,// ~ 94
+};
 
-/// @brief 菜单指令回调函数
-/// @param  command 指令
-/// @param  ... 可变参数列表根据指令定义
-/// @return  返回值根据指令定义
-int menu_command_callback(enum _menu_command command, ...)
+/*宽6像素，高8像素*/
+const uint8_t OLED_F6x8[][6] = 
+{
+    0x00,0x00,0x00,0x00,0x00,0x00,//   0
+    0x00,0x00,0x00,0x2F,0x00,0x00,// ! 1
+    0x00,0x00,0x07,0x00,0x07,0x00,// " 2
+    0x00,0x14,0x7F,0x14,0x7F,0x14,// # 3
+    0x00,0x24,0x2A,0x7F,0x2A,0x12,// $ 4
+    0x00,0x23,0x13,0x08,0x64,0x62,// % 5
+    0x00,0x36,0x49,0x55,0x22,0x50,// & 6
+    0x00,0x00,0x00,0x07,0x00,0x00,// ' 7
+    0x00,0x00,0x1C,0x22,0x41,0x00,// ( 8
+    0x00,0x00,0x41,0x22,0x1C,0x00,// ) 9
+    0x00,0x14,0x08,0x3E,0x08,0x14,// * 10
+    0x00,0x08,0x08,0x3E,0x08,0x08,// + 11
+    0x00,0x00,0x00,0xA0,0x60,0x00,// , 12
+    0x00,0x08,0x08,0x08,0x08,0x08,// - 13
+    0x00,0x00,0x60,0x60,0x00,0x00,// . 14
+    0x00,0x20,0x10,0x08,0x04,0x02,// / 15
+    0x00,0x3E,0x51,0x49,0x45,0x3E,// 0 16
+    0x00,0x00,0x42,0x7F,0x40,0x00,// 1 17
+    0x00,0x42,0x61,0x51,0x49,0x46,// 2 18
+    0x00,0x21,0x41,0x45,0x4B,0x31,// 3 19
+    0x00,0x18,0x14,0x12,0x7F,0x10,// 4 20
+    0x00,0x27,0x45,0x45,0x45,0x39,// 5 21
+    0x00,0x3C,0x4A,0x49,0x49,0x30,// 6 22
+    0x00,0x01,0x71,0x09,0x05,0x03,// 7 23
+    0x00,0x36,0x49,0x49,0x49,0x36,// 8 24
+    0x00,0x06,0x49,0x49,0x29,0x1E,// 9 25
+    0x00,0x00,0x36,0x36,0x00,0x00,// : 26
+    0x00,0x00,0x56,0x36,0x00,0x00,// ; 27
+    0x00,0x08,0x14,0x22,0x41,0x00,// < 28
+    0x00,0x14,0x14,0x14,0x14,0x14,// = 29
+    0x00,0x00,0x41,0x22,0x14,0x08,// > 30
+    0x00,0x02,0x01,0x51,0x09,0x06,// ? 31
+    0x00,0x3E,0x49,0x55,0x59,0x2E,// @ 32
+    0x00,0x7C,0x12,0x11,0x12,0x7C,// A 33
+    0x00,0x7F,0x49,0x49,0x49,0x36,// B 34
+    0x00,0x3E,0x41,0x41,0x41,0x22,// C 35
+    0x00,0x7F,0x41,0x41,0x22,0x1C,// D 36
+    0x00,0x7F,0x49,0x49,0x49,0x41,// E 37
+    0x00,0x7F,0x09,0x09,0x09,0x01,// F 38
+    0x00,0x3E,0x41,0x49,0x49,0x7A,// G 39
+    0x00,0x7F,0x08,0x08,0x08,0x7F,// H 40
+    0x00,0x00,0x41,0x7F,0x41,0x00,// I 41
+    0x00,0x20,0x40,0x41,0x3F,0x01,// J 42
+    0x00,0x7F,0x08,0x14,0x22,0x41,// K 43
+    0x00,0x7F,0x40,0x40,0x40,0x40,// L 44
+    0x00,0x7F,0x02,0x0C,0x02,0x7F,// M 45
+    0x00,0x7F,0x04,0x08,0x10,0x7F,// N 46
+    0x00,0x3E,0x41,0x41,0x41,0x3E,// O 47
+    0x00,0x7F,0x09,0x09,0x09,0x06,// P 48
+    0x00,0x3E,0x41,0x51,0x21,0x5E,// Q 49
+    0x00,0x7F,0x09,0x19,0x29,0x46,// R 50
+    0x00,0x46,0x49,0x49,0x49,0x31,// S 51
+    0x00,0x01,0x01,0x7F,0x01,0x01,// T 52
+    0x00,0x3F,0x40,0x40,0x40,0x3F,// U 53
+    0x00,0x1F,0x20,0x40,0x20,0x1F,// V 54
+    0x00,0x3F,0x40,0x38,0x40,0x3F,// W 55
+    0x00,0x63,0x14,0x08,0x14,0x63,// X 56
+    0x00,0x07,0x08,0x70,0x08,0x07,// Y 57
+    0x00,0x61,0x51,0x49,0x45,0x43,// Z 58
+    0x00,0x00,0x7F,0x41,0x41,0x00,// [ 59
+    0x00,0x02,0x04,0x08,0x10,0x20,// \ 60
+    0x00,0x00,0x41,0x41,0x7F,0x00,// ] 61
+    0x00,0x04,0x02,0x01,0x02,0x04,// ^ 62
+    0x00,0x40,0x40,0x40,0x40,0x40,// _ 63
+    0x00,0x00,0x01,0x02,0x04,0x00,// ` 64
+    0x00,0x20,0x54,0x54,0x54,0x78,// a 65
+    0x00,0x7F,0x48,0x44,0x44,0x38,// b 66
+    0x00,0x38,0x44,0x44,0x44,0x20,// c 67
+    0x00,0x38,0x44,0x44,0x48,0x7F,// d 68
+    0x00,0x38,0x54,0x54,0x54,0x18,// e 69
+    0x00,0x08,0x7E,0x09,0x01,0x02,// f 70
+    0x00,0x18,0xA4,0xA4,0xA4,0x7C,// g 71
+    0x00,0x7F,0x08,0x04,0x04,0x78,// h 72
+    0x00,0x00,0x44,0x7D,0x40,0x00,// i 73
+    0x00,0x40,0x80,0x84,0x7D,0x00,// j 74
+    0x00,0x7F,0x10,0x28,0x44,0x00,// k 75
+    0x00,0x00,0x41,0x7F,0x40,0x00,// l 76
+    0x00,0x7C,0x04,0x18,0x04,0x78,// m 77
+    0x00,0x7C,0x08,0x04,0x04,0x78,// n 78
+    0x00,0x38,0x44,0x44,0x44,0x38,// o 79
+    0x00,0xFC,0x24,0x24,0x24,0x18,// p 80
+    0x00,0x18,0x24,0x24,0x18,0xFC,// q 81
+    0x00,0x7C,0x08,0x04,0x04,0x08,// r 82
+    0x00,0x48,0x54,0x54,0x54,0x20,// s 83
+    0x00,0x04,0x3F,0x44,0x40,0x20,// t 84
+    0x00,0x3C,0x40,0x40,0x20,0x7C,// u 85
+    0x00,0x1C,0x20,0x40,0x20,0x1C,// v 86
+    0x00,0x3C,0x40,0x30,0x40,0x3C,// w 87
+    0x00,0x44,0x28,0x10,0x28,0x44,// x 88
+    0x00,0x1C,0xA0,0xA0,0xA0,0x7C,// y 89
+    0x00,0x44,0x64,0x54,0x4C,0x44,// z 90
+    0x00,0x00,0x08,0x7F,0x41,0x00,// { 91
+    0x00,0x00,0x00,0x7F,0x00,0x00,// | 92
+    0x00,0x00,0x41,0x7F,0x08,0x00,// } 93
+    0x00,0x08,0x04,0x08,0x10,0x08,// ~ 94
+};
+/*********************ASCII字模数据*/
+
+// Private variables ------------------------------------------------------------
+
+//OLED显存数组
+//所有的显示函数，都只是对此显存数组进行读写
+//随后调用OLED_Update函数或OLED_UpdateArea函数
+//才会将显存数组的数据发送到OLED硬件，进行显示
+static uint8_t menu_display_buf[8][128];
+
+//按键相关变量
+extern uint8_t input_key0;
+extern uint8_t input_key1;
+extern uint8_t input_key2;
+extern uint8_t input_key3;
+
+// Public variables -------------------------------------------------------------
+
+// Private functions prototypes -------------------------------------------------
+
+// Public functions prototypes --------------------------------------------------
+
+// Functions --------------------------------------------------------------------
+
+/**
+  * Function    : menu_oled_set_cursor
+  * Description : OLED设置显示光标位置
+  * Input       : Page 指定光标所在的页，范围：0~7
+  *               X 指定光标所在的X轴坐标，范围：0~127
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : OLED默认的Y轴，只能8个Bit为一组写入，即1页等于8个Y轴坐标
+  **/
+void menu_oled_set_cursor(uint8_t Page, uint8_t X)
+{
+    //如果使用此程序驱动1.3寸的OLED显示屏，则需要解除此注释
+    //因为1.3寸的OLED驱动芯片（SH1106）有132列
+    //屏幕的起始列接在了第2列，而不是第0列
+    //所以需要将X加2，才能正常显示
+//    X += 2;
+
+    /*通过指令设置页地址和列地址*/
+    drv_ssd1315_wr_byte(0xB0 | Page,DRV_SSD1315_OLED_CMD);                    //设置页位置
+    drv_ssd1315_wr_byte(0x10 | ((X & 0xF0) >> 4),DRV_SSD1315_OLED_CMD);    //设置X位置高4位
+    drv_ssd1315_wr_byte(0x00 | (X & 0x0F),DRV_SSD1315_OLED_CMD);            //设置X位置低4位
+}
+
+/**
+  * Function    : menu_oled_write_data
+  * Description : OLED写数据
+  * Input       : Data 要写入数据的起始地址
+  *               Count 要写入数据的数量
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_oled_write_data(uint8_t *Data, uint8_t Count)
+{
+    uint8_t i;
+
+    /*循环Count次，进行连续的数据写入*/
+    for (i = 0; i < Count; i ++)
+    {
+        drv_ssd1315_wr_byte(Data[i], DRV_SSD1315_OLED_DATA);    //依次发送Data的每一个数据
+    }
+}
+
+/**
+  * Function    : menu_oled_update
+  * Description : 将OLED显存数组更新到OLED屏幕
+  * Input       : 
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 所有的显示函数，都只是对OLED显存数组进行读写
+  *             : 随后调用menu_oled_update函数或menu_oled_update_area函数
+  *             : 才会将显存数组的数据发送到OLED硬件，进行显示
+  *             : 故调用显示函数后，要想真正地呈现在屏幕上，还需调用更新函数
+  **/
+void menu_oled_update(void)
+{
+//    {menu_oled_printf(128-6*6, 0, 6,"FPS %d", Timer_GetFPS());    }    //显示帧率;解除注释开启
+
+    uint8_t j;
+    /*遍历每一页*/
+    for (j = 0; j < 8; j ++)
+    {
+        /*设置光标位置为每一页的第一列*/
+        menu_oled_set_cursor(j, 0);
+        /*连续写入128个数据，将显存数组的数据写入到OLED硬件*/
+        menu_oled_write_data(menu_display_buf[j], 128);
+    }
+}
+
+/**
+  * Function    : menu_oled_clear
+  * Description : 将OLED显存数组全部清零
+  * Input       : 
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 调用此函数后，要想真正地呈现在屏幕上，还需调用更新函数
+  **/
+void menu_oled_clear(void)
+{
+    uint8_t i, j;
+    for (j = 0; j < 8; j ++)//遍历8页
+    {
+        for (i = 0; i < 128; i ++)//遍历128列
+        {
+            menu_display_buf[j][i] = 0x00;    //将显存数组数据全部清零
+        }
+    }
+}
+
+/**
+  * Function    : menu_oled_clear_area
+  * Description : 将OLED显存数组部分清零
+  * Input       : X 指定区域左上角的横坐标，范围：0~127
+  *               Y 指定区域左上角的纵坐标，范围：0~63
+  *               Width 指定区域的宽度，范围：0~128
+  *               Height 指定区域的高度，范围：0~64
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 调用此函数后，要想真正地呈现在屏幕上，还需调用更新函数
+  **/
+void menu_oled_clear_area(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height)
+{
+    uint8_t i, j;
+
+    /*参数检查，保证指定区域不会超出屏幕范围*/
+    if (X > 127) {return;}
+    if (Y > 63) {return;}
+    if (X + Width > 128) {Width = 128 - X;}
+    if (Y + Height > 64) {Height = 64 - Y;}
+
+    for (j = Y; j < Y + Height; j ++)        //遍历指定页
+    {
+        for (i = X; i < X + Width; i ++)    //遍历指定列
+        {
+            menu_display_buf[j / 8][i] &= ~(0x01 << (j % 8));    //将显存数组指定数据清零
+        }
+    }
+}
+
+/**
+  * Function    : menu_oled_show_image
+  * Description : OLED显示图像
+  * Input       : X 指定图像左上角的横坐标，范围：0~127
+  *               Y 指定图像左上角的纵坐标，范围：0~63
+  *               Width 指定图像的宽度，范围：0~128
+  *               Height 指定图像的高度，范围：0~64
+  *               Image 指定要显示的图像
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_oled_show_image(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height, const uint8_t *Image)
+{
+    uint8_t i, j;
+    /*参数检查，保证指定图像不会超出屏幕范围*/
+    if (X > 127) {return;}
+    if (Y > 63) {return;}
+
+    /*将图像所在区域清空*/
+    menu_oled_clear_area(X, Y, Width, Height);
+
+    /*遍历指定图像涉及的相关页*/
+    /*(Height - 1) / 8 + 1的目的是Height / 8并向上取整*/
+    uint8_t Height_ceil = (Height - 1) / 8 + 1;
+
+    for (j = 0; j < Height_ceil; j ++)
+    {
+        /*遍历指定图像涉及的相关列*/
+        for (i = 0; i < Width; i ++)
+        {
+            /*超出边界，则跳过显示*/
+            if (X + i > 127) {break;}
+            if (Y / 8 + j > 7) {return;}
+
+            /*显示图像在当前页的内容*/
+            menu_display_buf[Y / 8 + j][X + i] |= Image[j * Width + i] << (Y % 8);
+
+            /*超出边界，则跳过显示*/
+            /*使用continue的目的是，下一页超出边界时，上一页的后续内容还需要继续显示*/
+            if (Y / 8 + j + 1 > 7) {continue;}
+
+            /*显示图像在下一页的内容*/
+            menu_display_buf[Y / 8 + j + 1][X + i] |= Image[j * Width + i] >> (8 - Y % 8);
+        }
+    }
+}
+
+/**
+  * Function    : menu_oled_show_char
+  * Description : OLED显示一个字符
+  * Input       : X 指定字符左上角的横坐标，范围：0~127
+  *               Y 指定字符左上角的纵坐标，范围：0~63
+  *               Char 指定要显示的字符，范围：ASCII码可见字符
+  *               FontSize 指定字体大小 范围：OLED_8X16 宽8像素，高16像素 OLED_6X8 宽6像素，高8像素
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_oled_show_char(uint8_t X, uint8_t Y, char Char, uint8_t FontSize)
+{
+    if (FontSize == OLED_8X16)//字体为宽8像素，高16像素
+    {
+        /*将ASCII字模库OLED_F8x16的指定数据以8*16的图像格式显示*/
+        menu_oled_show_image(X, Y, 8, 16, OLED_F8x16[Char - ' ']);
+    }
+    else if(FontSize == OLED_6X8)//字体为宽6像素，高8像素
+    {
+        /*将ASCII字模库OLED_F6x8的指定数据以6*8的图像格式显示*/
+        menu_oled_show_image(X, Y, 6, 8, OLED_F6x8[Char - ' ']);
+    }
+}
+
+/**
+  * Function    : menu_oled_show_chn
+  * Description : OLED显示汉字单字
+  * Input       : X 指定字符串左上角的横坐标，范围：0~127
+  *               Y 指定字符串左上角的纵坐标，范围：0~63
+  *               Hanzi 指定要显示的字符，范围：字库字符
+  *               FontSize 指定字体大小  范围：OLED_8X16 宽8像素，高16像素 OLED_6X8 宽6像素，高8像素
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_oled_show_chn(int8_t X, int8_t Y, char *Hanzi, uint8_t FontSize) // 汉字单字打印;
+{
+    uint8_t pIndex;
+    for (pIndex = 0; strcmp(OLED_CF16x16[pIndex].Index, "") != 0; pIndex++)
+    {
+        /*找到匹配的汉字*/
+        if (strcmp(OLED_CF16x16[pIndex].Index, Hanzi) == 0)
+        {
+            break; // 跳出循环，此时pIndex的值为指定汉字的索引
+        }
+    }
+    /*将汉字字模库OLED_CF16x16的指定数据以16*16的图像格式显示*/
+    menu_oled_show_image(X, Y, 16, 16, OLED_CF16x16[pIndex].Data);
+}
+
+/**
+  * Function    : menu_oled_show_str
+  * Description : OLED显示字符串
+  * Input       : X 指定字符串左上角的横坐标，范围：0~127
+  *               Y 指定字符串左上角的纵坐标，范围：0~63
+  *               Hanzi 指定要显示的字符，范围：字库字符
+  *               FontSize 指定字体大小  范围：OLED_8X16 宽8像素，高16像素 OLED_6X8 宽6像素，高8像素
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_oled_show_str(uint8_t X, uint8_t Y, char *String, uint8_t FontSize) // 中英文打印;
+{
+    uint8_t i = 0, len = 0;
+    while (String[i] != '\0') // 遍历字符串的每个字符
+    {
+        if (String[i] == '\n')
+        {
+            Y += (FontSize == 8) ? 16 : 8;
+            len = 0;
+            i++;
+        } // 兼容换行符
+        if (X + (len + 1) * FontSize > 128)
+        {
+            Y += (FontSize == 8) ? 16 : 8;
+            len = 0;
+        } // 超出屏幕自动换行
+        if ((int8_t)Y > 64)
+        {
+            return;
+        } //
+
+        if (String[i] > '~') // 如果不属于英文字符
+        {
+            char SingleChinese[4] = {0};
+            SingleChinese[0] = String[i];
+            i++;
+            SingleChinese[1] = String[i];
+            if(OLED_CHN_CHAR_WIDTH == 3)
+            {
+                i++;
+                SingleChinese[2] = String[i];
+            }
+            if (FontSize == 8)
+            {
+                menu_oled_show_chn(X + len * FontSize, Y, SingleChinese, FontSize);
+            }
+            else
+            {
+                menu_oled_show_chn(X + len * FontSize, Y, SingleChinese, FontSize);
+            }
+
+            i++;
+            len += 2;
+        }
+        else /*调用OLED_ShowChar函数，依次显示每个字符*/
+        {
+            menu_oled_show_char(X + len * FontSize, Y, String[i], FontSize);
+            i++;
+            len++;
+        }
+    }
+}
+
+/**
+  * Function    : menu_oled_printf
+  * Description : OLED使用printf函数打印格式化字符串
+  * Input       : X 指定格式化字符串左上角的横坐标，范围：0~127
+  *               Y 指定格式化字符串左上角的纵坐标，范围：0~63
+  *               FontSize 指定字体大小  范围：OLED_8X16 宽8像素，高16像素 OLED_6X8 宽6像素，高8像素
+  *               format 指定要显示的格式化字符串，范围：ASCII码可见字符组成的字符串
+  *               ... 格式化字符串参数列表
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_oled_printf(uint8_t X, uint8_t Y, uint8_t FontSize, char *format, ...)
+{
+    char String[30];                        //定义字符数组
+    va_list arg;                            //定义可变参数列表数据类型的变量arg
+    va_start(arg, format);                    //从format开始，接收参数列表到arg变量
+    vsprintf(String, format, arg);            //使用vsprintf打印格式化字符串和参数列表到字符数组中
+    va_end(arg);                            //结束变量arg
+    menu_oled_show_str(X, Y, String, FontSize);//OLED显示字符数组（字符串）
+}
+
+/**
+  * Function    : menu_oled_reverse_area
+  * Description : 将OLED显存数组部分取反
+  * Input       : X 指定区域左上角的横坐标，范围：0~127
+  *               Y 指定区域左上角的纵坐标，范围：0~63
+  *               Width 指定区域的宽度，范围：0~128
+  *               Height 指定区域的高度，范围：0~64
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_oled_reverse_area(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height)
+{
+    uint8_t i, j;
+    
+    /*参数检查，保证指定区域不会超出屏幕范围*/
+    if (X > 127) {return;}
+    if (Y > 63) {return;}
+    if (X + Width > 128) {Width = 128 - X;}
+    if (Y + Height > 64) {Height = 64 - Y;}
+    
+    for (j = Y; j < Y + Height; j ++)        //遍历指定页
+    {
+        for (i = X; i < X + Width; i ++)    //遍历指定列
+        {
+            menu_display_buf[j / 8][i] ^= 0x01 << (j % 8);    //将显存数组指定数据取反
+        }
+    }
+}
+
+/**
+  * Function    : menu_oled_draw_point
+  * Description : OLED在指定位置画一个点
+  * Input       : X 指定点的横坐标，范围：0~127
+  *               Y 指定点的纵坐标，范围：0~63
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 调用此函数后，要想真正地呈现在屏幕上，还需调用更新函数
+  **/
+void menu_oled_draw_point(uint8_t X, uint8_t Y)
+{
+    /*参数检查，保证指定位置不会超出屏幕范围*/
+    if (X > 127) {return;}
+    if (Y > 63) {return;}
+    
+    /*将显存数组指定位置的一个Bit数据置1*/
+    menu_display_buf[Y / 8][X] |= 0x01 << (Y % 8);
+}
+
+/**
+  * Function    : menu_oled_draw_retangle
+  * Description : OLED画矩形
+  * Input       : X 指定矩形左上角的横坐标，范围：0~127
+  *               Y 指定矩形左上角的纵坐标，范围：0~63
+  *               Width 指定矩形的宽度，范围：0~128
+  *               Height 指定矩形的高度，范围：0~64
+  *               IsFilled 指定矩形是否填充 范围：OLED_UNFILLED        不填充 OLED_FILLED            填充
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_oled_draw_retangle(uint8_t X, uint8_t Y, uint8_t Width, uint8_t Height, uint8_t IsFilled)
+{
+    uint8_t i, j;
+    if (!IsFilled)        //指定矩形不填充
+    {
+        /*遍历上下X坐标，画矩形上下两条线*/
+        for (i = X; i < X + Width; i ++)
+        {
+            menu_oled_draw_point(i, Y);
+            menu_oled_draw_point(i, Y + Height - 1);
+        }
+        /*遍历左右Y坐标，画矩形左右两条线*/
+        for (i = Y; i < Y + Height; i ++)
+        {
+            menu_oled_draw_point(X, i);
+            menu_oled_draw_point(X + Width - 1, i);
+        }
+    }
+    else                //指定矩形填充
+    {
+        /*遍历X坐标*/
+        for (i = X; i < X + Width; i ++)
+        {
+            /*遍历Y坐标*/
+            for (j = Y; j < Y + Height; j ++)
+            {
+                /*在指定区域画点，填充满矩形*/
+                menu_oled_draw_point(i, j);
+            }
+        }
+    }
+}
+
+/**
+  * Function    : menu_command_callback
+  * Description : 菜单指令回调函数
+  * Input       : command 指令
+  *               ... 可变参数列表根据指令定义
+  * Output      : 
+  * Return      : 返回值根据指令定义
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+int menu_command_callback(enum _MENU_CMD_S command, ...)
 {
     int retval = 0;
 
@@ -88,13 +807,13 @@ int menu_command_callback(enum _menu_command command, ...)
         /* Output */
     case BUFFER_DISPLAY: // 无参无返
     {
-        OLED_Update();
+        menu_oled_update();
     }
     break;
 
     case BUFFER_CLEAR: // 无参无返
     {
-        OLED_Clear();
+        menu_oled_clear();
     }
     break;
 
@@ -104,11 +823,11 @@ int menu_command_callback(enum _menu_command command, ...)
         int *arg_list = ((int *)&command) + 1; // 指针偏移4字节, 指向第一个参数
         int show_x = arg_list[0];
         int show_y = arg_list[1];
-        char *show_string = (char *)arg_list[2];
+        char* show_string = (char *)arg_list[2];
 
         /* 按需使用参数 */
-        retval = OLED_Printf(show_x, show_y, MENU_FONT_W, show_string); // 显示字符串
-        // retval = strlen(show_string); // 如果你的显示字符串函数没有返回值, 也可以使用strlen()函数获取字符串长度
+        menu_oled_printf(show_x, show_y, MENU_FONT_W, show_string); // 显示字符串
+        retval = strlen(show_string); // 如果你的显示字符串函数没有返回值, 也可以使用strlen()函数获取字符串长度
     }
     break;
 
@@ -122,9 +841,9 @@ int menu_command_callback(enum _menu_command command, ...)
         int cursor_yend = arg_list[3];
 
         /* 按需使用参数 */
-        OLED_ReverseArea(cursor_xsta, cursor_ysta, COORD_CHANGE_SIZE(cursor_xsta, cursor_xend),
+        menu_oled_reverse_area(cursor_xsta, cursor_ysta, COORD_CHANGE_SIZE(cursor_xsta, cursor_xend),
                          COORD_CHANGE_SIZE(cursor_ysta, cursor_yend));
-        // OLED_DrawRectangle(cursor_xsta, cursor_ysta, COORD_CHANGE_SIZE(cursor_xsta, cursor_xend),
+        // menu_oled_draw_retangle(cursor_xsta, cursor_ysta, COORD_CHANGE_SIZE(cursor_xsta, cursor_xend),
         //                    COORD_CHANGE_SIZE(cursor_ysta, cursor_yend), 0);
     }
     break;
@@ -139,31 +858,41 @@ int menu_command_callback(enum _menu_command command, ...)
         int frame_height = arg_list[3];
 
         /* 按需使用参数 */
-        OLED_DrawRectangle(frame_x, frame_y, frame_width, frame_height, 0);
+        menu_oled_draw_retangle(frame_x, frame_y, frame_width, frame_height, 0);
     }
     break;
 
     /* Input */
     case GET_EVENT_ENTER: // 参数: 无; 返回: 布尔;
     {
-        retval = Key_GetEvent_Enter() || Key_GetEvent_Right(); // 这代表两个按键都可以触发这个事件
+//        retval = Key_GetEvent_Enter() || Key_GetEvent_Right(); // 这代表两个按键都可以触发这个事件
+        retval = input_key0;
+        input_key0 = 0;
     }
     break;
 
     case GET_EVENT_BACK: // 参数: 无; 返回: 布尔;
     {
-        retval = Key_GetEvent_Back();
+//        retval = Key_GetEvent_Back();
+        retval = input_key1;
+        input_key1 = 0;
     }
     break;
 
     case GET_EVENT_WHEEL: // 参数: 无; 返回: int16_t 滚动量;
     {
-        if (Key_GetEvent_Up())
+        if (input_key2)
+        {
             retval = 1;
-        else if (Key_GetEvent_Down())
+            input_key2 = 0;
+        }
+        else if (input_key3)
+        {
             retval = -1;
-        else
-            retval = Key_Encoder_Take(&Encoder1); // 这代表上下按键及编码器旋钮都可以触发这个事件, 注意返回值是有符号的
+            input_key3 = 0;
+        }
+//        else
+//            retval = Key_Encoder_Take(&Encoder1); // 这代表上下按键及编码器旋钮都可以触发这个事件, 注意返回值是有符号的
     }
     break;
 
@@ -174,35 +903,82 @@ int menu_command_callback(enum _menu_command command, ...)
     return retval;
 }
 
-/* ***************************************************** Port 移植接口 ** */
-
-/* ******************************************************** */
-
-/// @brief 菜单运行函数
-/// @param hMENU 菜单句柄
-void MENU_RunMenu(MENU_HandleTypeDef *hMENU)
+/**
+  * Function    : menu_run_menu
+  * Description : 菜单运行函数
+  * Input       : hMENU 菜单句柄
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_run_menu(MENU_HANDLE_TYPE_T *hMENU)
 {
-    MENU_HandleInit(hMENU); // 初始化
+    menu_handle_init(hMENU); // 初始化
 
     while (hMENU->isRun)
     {
         menu_command_callback(BUFFER_CLEAR); // 擦除缓冲区
 
-        MENU_ShowOptionList(hMENU); /* 显示选项列表 */
-        MENU_ShowCursor(hMENU);     /* 显示光标 */
-        MENU_ShowBorder(hMENU);     // 显示边框
+        menu_show_option_list(hMENU); /* 显示选项列表 */
+        menu_show_cursor(hMENU);     /* 显示光标 */
+        menu_show_border(hMENU);     // 显示边框
 
         menu_command_callback(BUFFER_DISPLAY); // 缓冲区更新至显示器
 
-        MENU_Event_and_Action(hMENU); // 检查事件及作相应操作
+        menu_event_and_action(hMENU); // 检查事件及作相应操作
+
+        OSATaskSleep(1);
     }
 }
 
-void MENU_HandleInit(MENU_HandleTypeDef *hMENU)
+/**
+  * Function    : menu_display_menu
+  * Description : 菜单显示
+  * Input       : hMENU 菜单句柄
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_display_menu(MENU_HANDLE_TYPE_T *hMENU)
+{
+    menu_handle_init(hMENU); // 初始化
+
+    while (hMENU->isRun)
+    {
+        menu_command_callback(BUFFER_CLEAR); // 擦除缓冲区
+
+        menu_show_option_list(hMENU); /* 显示选项列表 */
+//        menu_show_cursor(hMENU);     /* 显示光标 */
+        menu_show_border(hMENU);     // 显示边框
+
+        menu_command_callback(BUFFER_DISPLAY); // 缓冲区更新至显示器
+
+        menu_event_and_action(hMENU); // 检查事件及作相应操作
+
+        OSATaskSleep(1);
+        break;
+    }
+}
+
+/**
+  * Function    : menu_handle_init
+  * Description : 菜单初始化
+  * Input       : hMENU 菜单句柄
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_handle_init(MENU_HANDLE_TYPE_T *hMENU)
 {
     hMENU->isRun = 1;                // 运行标志
     hMENU->AnimationUpdateEvent = 1; // 动画更新事件
-    hMENU->Catch_i = 1;              // 选中下标默认为1,(因为hMENU->OptionList[0]为"<<<")
+    hMENU->Catch_i = 0;              // 选中下标默认为0
     hMENU->Cursor_i = 0;             // 光标下标默认为0
     hMENU->Show_i = 0;               // 显示(遍历)起始下标
     hMENU->Show_i_Previous = 1;      // CURSOR_CEILING + 1; // 上一次循环的显示下标
@@ -212,12 +988,22 @@ void MENU_HandleInit(MENU_HandleTypeDef *hMENU)
          hMENU->Option_Max_i++) // 计算选项列表长度
     {
         hMENU->OptionList[hMENU->Option_Max_i].StrLen =
-            MENU_ShowOption(0, 0, &hMENU->OptionList[hMENU->Option_Max_i]); // 获取字符串长度
+            menu_show_option(0, 0, &hMENU->OptionList[hMENU->Option_Max_i]); // 获取字符串长度
     }
     hMENU->Option_Max_i--; // 不显示".."
 }
 
-void MENU_Event_and_Action(MENU_HandleTypeDef *hMENU)
+/**
+  * Function    : menu_event_and_action
+  * Description : 处理相应按键事件
+  * Input       : hMENU 菜单句柄
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_event_and_action(MENU_HANDLE_TYPE_T *hMENU)
 {
     if (menu_command_callback(GET_EVENT_ENTER)) /* 确定事件 如果选中的选项功能不为空则执行功能, 否则退出运行 */
     {
@@ -241,13 +1027,23 @@ void MENU_Event_and_Action(MENU_HandleTypeDef *hMENU)
 
         if (hMENU->Wheel_Event) /* 滚动事件 更新选中下标和光标下标 */
         {
-            MENU_UpdateIndex(hMENU);
+            menu_updata_idx(hMENU);
             hMENU->AnimationUpdateEvent = 1;
         }
     }
 }
 
-void MENU_UpdateIndex(MENU_HandleTypeDef *hMENU)
+/**
+  * Function    : menu_updata_idx
+  * Description : 更新菜单选中下标
+  * Input       : hMENU 菜单句柄
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_updata_idx(MENU_HANDLE_TYPE_T *hMENU)
 {
     /* 更新下标 */
     hMENU->Cursor_i += hMENU->Wheel_Event;
@@ -274,12 +1070,23 @@ void MENU_UpdateIndex(MENU_HandleTypeDef *hMENU)
         hMENU->Cursor_i = 0;
 }
 
-void MENU_ShowOptionList(MENU_HandleTypeDef *hMENU)
+/**
+  * Function    : menu_show_option_list
+  * Description : 菜单显示列表
+  * Input       : hMENU 菜单句柄
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_show_option_list(MENU_HANDLE_TYPE_T *hMENU)
 {
     static float VerticalOffsetBuffer; // 垂直偏移缓冲
-
+    int16_t i = 0;
+    
     /* 计算显示起始下标 */
-    hMENU->Show_i = hMENU->Catch_i - hMENU->Cursor_i; // 详解 https://www.bilibili.com/read/cv32114635/?jump_opus=1
+    hMENU->Show_i = hMENU->Catch_i - hMENU->Cursor_i;
 
     if (hMENU->Show_i_Previous != hMENU->Show_i) // 如果显示下标有变化
     {
@@ -292,7 +1099,7 @@ void MENU_ShowOptionList(MENU_HandleTypeDef *hMENU)
         VerticalOffsetBuffer = STEPWISE_TO_TARGET(VerticalOffsetBuffer, 0, ANIMATION_SPEED); // 行显示偏移量逐渐归零
     }
 
-    for (int16_t i = -1; i <= CURSOR_CEILING + 1; i++) // 遍历显示 选项
+    for (i = -1; i <= CURSOR_CEILING + 1; i++) // 遍历显示 选项
     {
         if (hMENU->Show_i + i < 0)
             continue;
@@ -309,49 +1116,60 @@ void MENU_ShowOptionList(MENU_HandleTypeDef *hMENU)
         int16_t y = MENU_Y + MENU_MARGIN + (i * MENU_LINE_H) + ((MENU_LINE_H - MENU_FONT_H) / 2) + (int)VerticalOffsetBuffer;
 
         /* 显示选项, 并记录长度 */
-        hMENU->OptionList[hMENU->Show_i + i].StrLen = MENU_ShowOption(x, y, &hMENU->OptionList[hMENU->Show_i + i]);
+        hMENU->OptionList[hMENU->Show_i + i].StrLen = menu_show_option(x, y, &hMENU->OptionList[hMENU->Show_i + i]);
     }
 }
 
-uint8_t MENU_ShowOption(int16_t X, int16_t Y, MENU_OptionTypeDef *Option)
+/**
+  * Function    : menu_show_option
+  * Description : 根据数据类型显示
+  * Input       : X 坐标
+  *               Y 坐标
+  *               hMENU 菜单句柄
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+uint8_t menu_show_option(int16_t X, int16_t Y, MENU_OPTION_TYPE_T *Option)
 {
     char String[64]; // 定义字符数组
 
     switch (Option->StrVarType)
     {
-    case INT8:
+    case OLED_INT8:
         sprintf(String, Option->String, *(int8_t *)Option->StrVarPointer);
         break;
 
-    case UINT8:
+    case OLED_UINT8:
         sprintf(String, Option->String, *(uint8_t *)Option->StrVarPointer);
         break;
 
-    case INT16:
+    case OLED_INT16:
         sprintf(String, Option->String, *(int16_t *)Option->StrVarPointer);
         break;
 
-    case UINT16:
+    case OLED_UINT16:
         sprintf(String, Option->String, *(uint16_t *)Option->StrVarPointer);
         break;
 
-    case INT32:
+    case OLED_INT32:
         sprintf(String, Option->String, *(int32_t *)Option->StrVarPointer);
         break;
 
-    case UINT32:
-        sprintf(String, Option->String, *(uint32_t *)Option->StrVarPointer);
+    case OLED_UINT32:
+        sprintf(String, Option->String, *(UINT32 *)Option->StrVarPointer);
         break;
 
-    case CHAR:
+    case OLED_CHAR:
         sprintf(String, Option->String, *(char *)Option->StrVarPointer);
         break;
 
-    case STRING:
+    case OLED_STRING:
         sprintf(String, Option->String, (char *)Option->StrVarPointer);
         break;
 
-    case FLOAT:
+    case OLED_FLOAT:
         sprintf(String, Option->String, *(float *)Option->StrVarPointer);
         break;
 
@@ -363,7 +1181,17 @@ uint8_t MENU_ShowOption(int16_t X, int16_t Y, MENU_OptionTypeDef *Option)
     return menu_command_callback(SHOW_STRING, X, Y, String); // 显示字符数组（字符串）
 }
 
-void MENU_ShowCursor(MENU_HandleTypeDef *hMENU)
+/**
+  * Function    : menu_show_cursor
+  * Description : 显示光标
+  * Input       : hMENU 菜单句柄
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_show_cursor(MENU_HANDLE_TYPE_T *hMENU)
 {
     static float actual_xsta, actual_ysta, actual_xend, actual_yend; // actual
     static float target_xsta, target_ysta, target_xend, target_yend; // target
@@ -454,77 +1282,25 @@ void MENU_ShowCursor(MENU_HandleTypeDef *hMENU)
                           (int)(actual_yend + 0.5));
 }
 
-void MENU_ShowBorder(MENU_HandleTypeDef *hMENU) // 显示边框
+/**
+  * Function    : menu_show_border
+  * Description : 显示边框
+  * Input       : hMENU 菜单句柄
+  *               
+  * Output      : 
+  * Return      : 
+  * Auther      : zhaoning
+  * Others      : 
+  **/
+void menu_show_border(MENU_HANDLE_TYPE_T *hMENU) // 显示边框
 {
-    for (int16_t i = 0; i < MENU_BORDER; i++)
+    int16_t i = 0;
+    
+    for (i = 0; i < MENU_BORDER; i++)
     {
         menu_command_callback(DRAW_FRAME, MENU_X + i, MENU_Y + i, MENU_WIDTH - i - i, MENU_HEIGHT - i - i);
     }
 }
 
-/* ******************************************************** */
+// End of file : menu.c 2024-7-3 12:03:02 by: zhaoning 
 
-/* ******************************************************** */
-/* 应用示例 */
-
-void MENU_RunMainMenu(void)
-{
-    static MENU_OptionTypeDef MENU_OptionList[] = {{"<<<"},
-                                                   {"Tools", MENU_RunToolsMenu},      // 工具
-                                                   {"Games", MENU_RunGamesMenu},      // 游戏
-                                                   {"Setting", NULL},                 // 设置
-                                                   {"Information", MENU_Information}, // 信息
-                                                   {".."}};
-
-    static MENU_HandleTypeDef MENU = {.OptionList = MENU_OptionList};
-
-    MENU_RunMenu(&MENU);
-}
-
-void MENU_RunToolsMenu(void)
-{
-    static MENU_OptionTypeDef MENU_OptionList[] = {{"<<<"},
-                                                   {"Seria", NULL},        // 串口
-                                                   {"Oscilloscope", NULL}, // 示波器
-                                                   {"PWM Output", NULL},   // PWM 输出
-                                                   {"PWM Input", NULL},    // PWM 输入
-                                                   {"ADC Input", NULL},    // ADC 输入
-                                                   {".."}};
-
-    static MENU_HandleTypeDef MENU = {.OptionList = MENU_OptionList};
-
-    MENU_RunMenu(&MENU);
-}
-
-void MENU_RunGamesMenu(void)
-{
-    static MENU_OptionTypeDef MENU_OptionList[] = {{"<<<"},
-                                                   {"Snake", NULL},        // 贪吃蛇
-                                                   {"Snake II", NULL},     // 贪吃蛇2
-                                                   {"Snake III", NULL},    // 贪吃蛇3
-                                                   {"Game of Life", NULL}, // 康威生命游戏
-                                                   {".."}};
-
-    static MENU_HandleTypeDef MENU = {.OptionList = MENU_OptionList};
-
-    MENU_RunMenu(&MENU);
-}
-
-void MENU_Information(void)
-{
-    menu_command_callback(BUFFER_CLEAR);
-    menu_command_callback(SHOW_STRING, 5, 0, "menu v2.0\nBy:Adam\nbilibili\nUP:加油哦大灰狼");
-    menu_command_callback(BUFFER_DISPLAY);
-
-    while (1)
-    {
-
-        if (menu_command_callback(GET_EVENT_ENTER))
-            return;
-
-        if (menu_command_callback(GET_EVENT_BACK))
-            return;
-    }
-}
-
-/**********************************************************/

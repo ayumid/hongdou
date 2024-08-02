@@ -33,6 +33,8 @@
 static struct sockaddr_in dtu_n_dest_addr;//for UDP param
 static UINT8 dtu_agnss_task_stack[DTU_AGNSS_TASK_STACK_SIZE];
 static OSTaskRef dtu_agnss_task_ref = NULL;
+static UINT8 dtu_agnss_dl_task_stack[DTU_AGNSS_TASK_STACK_SIZE];
+static OSTaskRef dtu_agnss_dl_task_ref = NULL;
 
 static DTU_SOCKET_PARAM_T dtu_agnss_socket_group;
 
@@ -374,7 +376,8 @@ void dtu_agnss_sokcet_task_init(void)
     ASSERT(status == OS_SUCCESS);
 
     //下行数据接收线程
-    sys_thread_new("dtu_agnss_sockrcv_thread", (lwip_thread_fn)dtu_agnss_sockrcv_thread, NULL, DTU_DEFAULT_THREAD_STACKSIZE * 5, 161);
+    status = OSATaskCreate(&dtu_task_ref, dtu_task_stack, DTU_DEFAULT_THREAD_STACKSIZE * 5, 150, "dtu_agnss_sockrcv_thread", dtu_agnss_sockrcv_thread, NULL);
+    ASSERT(status == OS_SUCCESS);
 }
 
 // End of file : am_socket.c 2023-8-28 10:59:53 by: zhaoning 

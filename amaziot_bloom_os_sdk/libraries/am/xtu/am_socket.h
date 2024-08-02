@@ -35,7 +35,7 @@ extern "C" {
 
 // Public functions prototypes --------------------------------------------------
 
-void dtu_sockrcv_thread(void);
+void dtu_sockrcv_thread(void* ptr);
 void dtu_set_socket_fn(void);
 int dtu_socket_write(const void *data, size_t data_sz);
 #endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 16:36:24 by: zhaoning */

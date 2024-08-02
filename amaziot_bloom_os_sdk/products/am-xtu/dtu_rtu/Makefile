@@ -7,13 +7,13 @@ PROJECTFLAG ?= flag-1606l.mak
 -include $(TOP)\amaziot_bloom_os_sdk\$(PROJECTFLAG)
 
 #=====================dtu version start========================#
-DTU_TCP := yes#TCP版本，定义这个宏定义
-#DTU_MQTT := yes#MQTT版本，定义这个宏定义
+#DTU_TCP := yes#TCP版本，定义这个宏定义
+DTU_MQTT := yes#MQTT版本，定义这个宏定义
 DTU_GNSS := yes#包含GNSS功能，定义这个宏定义
-#DTU_JSON := yes#包含JSON协议，定义这个宏定义
-#DTU_CJSON := yes#包含CJSON，定义这个宏定义
+DTU_JSON := yes#包含JSON协议，定义这个宏定义
+DTU_CJSON := yes#包含CJSON，定义这个宏定义
 #DTU_DODIAI := yes#包含DI，DO，AI功能，定义这个宏定义
-#DTU_MODBUS := yes#包含Modbus功能，定义这个宏定义
+DTU_MODBUS := yes#包含Modbus功能，定义这个宏定义
 #DTU_HTTP := yes#包含HTTP功能，定义这个宏定义，HTTP作为TCP或MQTT附加功能出现
 #DTU_FORMAT := yes#包含格式化透传数据，定义这个宏定义
 #DTU_AGNSS := yes#包含AGNSS功能，定义这个宏定义，基于中科微agnss，其它厂家可能不适用

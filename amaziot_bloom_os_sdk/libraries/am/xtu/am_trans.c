@@ -25,7 +25,12 @@
 
 // Private defines / typedefs ---------------------------------------------------
 
+#define DTU_TRANS_TASK_STACK_SIZE     DTU_DEFAULT_THREAD_STACKSIZE * 4
+
 // Private variables ------------------------------------------------------------
+
+static OSTaskRef dtu_trans_task_ref = NULL;
+static UINT32 dtu_trans_task_stack[DTU_TRANS_TASK_STACK_SIZE / sizeof(UINT32)];
 
 // Public variables -------------------------------------------------------------
 
@@ -90,7 +95,7 @@ void dtu_uart_data_recv_cbk(UINT8 *data, UINT32 len)
   * Auther      : zhaoning
   * Others      : 
   **/
-void dtu_uart_data_recv_thread(void)
+void dtu_uart_data_recv_thread(void* ptr)
 {
     DTU_MSG_UART_DATA_PARAM_T uart_temp = {0};
     OSA_STATUS status = {0};
@@ -181,8 +186,8 @@ void dtu_trans_task_init(void)
     DIAG_ASSERT(status == OS_SUCCESS);
 
     //串口数据接收线程
-    sys_thread_new("dtu_uart_data_recv_thread", (lwip_thread_fn)dtu_uart_data_recv_thread, NULL, DTU_DEFAULT_THREAD_STACKSIZE * 4, 161);
-    
+    status = OSATaskCreate(&dtu_trans_task_ref, dtu_trans_task_stack, DTU_TRANS_TASK_STACK_SIZE, 160, "dtu_uart_data_recv_thread", dtu_uart_data_recv_thread, NULL);
+    ASSERT(status == OS_SUCCESS);
 }
 
 // End of file : am_trans.c 2023-11-17 9:25:36 by: zhaoning 

@@ -26,10 +26,14 @@
 
 // Private defines / typedefs ---------------------------------------------------
 
+#define DTU_GNSS_TASK_STACK_SIZE     DTU_DEFAULT_THREAD_STACKSIZE * 4
+
 // Private variables ------------------------------------------------------------
 
 static DTU_GNSS_NMEA_T dtu_gnss_nmea_t;
 static OSATimerRef dtu_gnss_timer_ref;
+static OSTaskRef dtu_gnss_task_ref = NULL;
+static UINT32 dtu_gnss_task_stack[DTU_GNSS_TASK_STACK_SIZE / sizeof(UINT32)];
 
 // Public variables -------------------------------------------------------------
 
@@ -453,7 +457,7 @@ void dtu_uart4_data_send_thread(void *param)
         status = OSAMsgQRecv(dtu_uart_ctx->dtu_msgq_uart4, (UINT8 *)&uart4_rdata, sizeof(DTU_MSG_UART_DATA_PARAM_T), OSA_SUSPEND);    //recv data from uart
         if (status == OS_SUCCESS)
         {
-            uprintf("%s: id:%d\n", __FUNCTION__, uart4_rdata.id);
+//            uprintf("%s: id:%d\n", __FUNCTION__, uart4_rdata.id);
             //为了安全，等当前线程刚开始运行后，在给gnss芯片上电，接收串口4数据
             if(DTU_UART4_MSG_ID_INIT == uart4_rdata.id)
             {
@@ -469,7 +473,7 @@ void dtu_uart4_data_send_thread(void *param)
             {
                 if(NULL != uart4_rdata.UArgs)
                 {
-                    uprintf("%s: len:%d, data:%s\n", __FUNCTION__, uart4_rdata.len, (char *)(uart4_rdata.UArgs));
+//                    uprintf("%s: len:%d, data:%s\n", __FUNCTION__, uart4_rdata.len, (char *)(uart4_rdata.UArgs));
                     dtu_gnss_data_prase(uart4_rdata.UArgs, uart4_rdata.len);
 #ifdef GNSS_ANALYSIS
                     p_gnrmc = &dtu_gnss_nmea_t.a_nmea_gnrmc[0];
@@ -515,9 +519,9 @@ void dtu_gnss_task_init(void)
     status = OSAMsgQCreate(&dtu_uart_ctx->dtu_msgq_uart4, "dtu_msgq_uart4", sizeof(DTU_MSG_UART_DATA_PARAM_T), 10, OS_FIFO);
     DIAG_ASSERT(status == OS_SUCCESS);
 
-    
     //创建gnss串口4接收任务
-    sys_thread_new("dtu_uart4_data_send_thread", (lwip_thread_fn)dtu_uart4_data_send_thread, NULL, DTU_DEFAULT_THREAD_STACKSIZE * 4, 161);
+    status = OSATaskCreate(&dtu_gnss_task_ref, dtu_gnss_task_stack, DTU_GNSS_TASK_STACK_SIZE, 150, "dtu_uart4_data_send_thread", dtu_uart4_data_send_thread, NULL);
+    ASSERT(status == OS_SUCCESS);
 }
 
 // End of file : am_gnss.c 2023-9-11 17:09:45 by: zhaoning 

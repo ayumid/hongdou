@@ -27,10 +27,13 @@
 // Private defines / typedefs ---------------------------------------------------
 
 #define DTU_RECV_MAX_BUFF 2048 //socket revBuf length
+#define DTU_SOCKET_TASK_STACK_SIZE     DTU_DEFAULT_THREAD_STACKSIZE * 5
 
 // Private variables ------------------------------------------------------------
 
 static struct sockaddr_in dtu_n_dest_addr;//for UDP param
+static OSTaskRef dtu_socket_task_ref = NULL;
+static UINT32 dtu_socket_task_stack[DTU_SOCKET_TASK_STACK_SIZE / sizeof(UINT32)];
 
 // Public variables -------------------------------------------------------------
 
@@ -334,7 +337,7 @@ void dtu_send_serial_data_to_server(DTU_MSG_UART_DATA_PARAM_T * uartData)
   * Auther      : zhaoning
   * Others      : 
   **/
-void dtu_sockrcv_thread(void)
+void dtu_sockrcv_thread(void* ptr)
 {
     DTU_SOCKET_RECV_TYPE_T sock_temp = {0};
     int rcv = 0;
@@ -504,7 +507,8 @@ void dtu_sokcet_task_init(void)
     DIAG_ASSERT(status == OS_SUCCESS);
 
     //下行数据接收线程
-    sys_thread_new("dtu_sockrcv_thread", (lwip_thread_fn)dtu_sockrcv_thread, NULL, DTU_DEFAULT_THREAD_STACKSIZE * 5, 161);
+    status = OSATaskCreate(&dtu_socket_task_ref, dtu_socket_task_stack, DTU_SOCKET_TASK_STACK_SIZE, 160, "dtu_sockrcv_thread", dtu_sockrcv_thread, NULL);
+    ASSERT(status == OS_SUCCESS);
 }
 
 // End of file : am_socket.c 2023-8-28 10:59:53 by: zhaoning 

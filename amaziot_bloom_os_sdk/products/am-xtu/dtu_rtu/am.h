@@ -54,7 +54,7 @@ extern "C" {
 #define dtu_ms_sleep(x) OSATaskSleep((x) * 20)//100*msecond
 #define dtu_10ms_sleep(x) OSATaskSleep((x) * 2)//10*msecond
 
-#define DTU_VERSION                 "V1.0"
+#define DTU_VERSION                 "V1.0.0"
 #define DTU_CGMI                    "Beijing Amaziot Co.,Ltd."
 #define DTU_CGMM                    "Amaziot AM430EV5"
 #define DTU_CGMR                    "AM430EV5"
@@ -63,7 +63,7 @@ extern "C" {
 //#define DTU_UART_REGULAR_BAUD
 
 #ifdef DTU_TYPE_DODIAI_INCLUDE
-#define DTU_TYPE                    "AP5000MT_R"
+#define DTU_TYPE                    "AP4000MT_R"
 #else
 #define DTU_TYPE                    "AP4000MT_D"
 #endif /* ifdef DTU_TYPE_DODIAI_INCLUDE.2023-10-31 12:16:13 by: zhaoning */

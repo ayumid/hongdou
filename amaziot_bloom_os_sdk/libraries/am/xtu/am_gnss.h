@@ -31,7 +31,7 @@ extern "C" {
 
 // Public defines / typedefs ----------------------------------------------------
 
-#define                 GNSS_ANALYSIS
+//#define                 GNSS_ANALYSIS
 
 #define                 MODULES_GNSS_NMEA_RES_LEN                     (1024)//上报服务器缓冲区长度
 #define                 MODULES_GNSS_NMEA_LEN                         (768)//串口接收最大语句长度

@@ -1,0 +1,184 @@
+
+#include "ql_uart_api.h"
+
+typedef enum QL_UART_PORT_NUMBER_ENUM 
+{
+	QL_DEBUG_UART_PORT, 	//debug uart, (RX,TX: GPIO29,30) default debug log, can not use
+	QL_BT_UART_PORT,		//UART3
+	QL_MAIN_UART_PORT,	//UART
+	QL_UART4_PORT,		//UART4
+
+	QL_USB_AT_PORT,		//USB AT PORT		{YUGA HS-USB AT 4E3C(COMX)}
+	QL_USB_MODEM_PORT,	//USB MODEM PORT 	{YUGA LTE USB Modem 4E3C}
+}QL_UART_PORT_NUMBER_E;
+
+typedef enum QL_UART_FLOWCTRL_ENUM
+{
+	QL_FC_NONE = 0,
+	QL_FC_HW,
+}QL_UART_FLOWCTRL_E;
+
+typedef enum QL_UART_BAUD_ENUM
+{
+	QL_UART_BAUD_300 		= 300,
+	QL_UART_BAUD_600    	= 600,
+	QL_UART_BAUD_1200       = 1200,
+	QL_UART_BAUD_2400       = 2400,
+	QL_UART_BAUD_3600       = 3600,
+	QL_UART_BAUD_4800       = 4800,
+	QL_UART_BAUD_7200       = 7200,
+	QL_UART_BAUD_9600       = 9600,
+	QL_UART_BAUD_14400      = 14400,
+	QL_UART_BAUD_19200      = 19200,
+	QL_UART_BAUD_28800      = 28800,
+	QL_UART_BAUD_38400      = 38400,
+	QL_UART_BAUD_57600      = 57600,
+	QL_UART_BAUD_115200     = 115200,
+	QL_UART_BAUD_230400     = 230400,
+	QL_UART_BAUD_460800     = 460800,
+	QL_UART_BAUD_921600     = 921600,
+}QL_UART_BAUD_E;
+
+typedef enum QL_UART_DATABIT_ENUM
+{
+	QL_UART_DATABIT_5,
+	QL_UART_DATABIT_6,
+	QL_UART_DATABIT_7,
+	QL_UART_DATABIT_8,
+}QL_UART_DATABIT_E;
+
+typedef enum QL_UART_STOPBIT_ENUM
+{
+	QL_UART_STOP_1,
+	QL_UART_STOP_2,
+}QL_UART_STOPBIT_E;
+
+typedef enum QL_UART_PARITYBIT_ENUM
+{
+	QL_UART_PARITY_NONE,
+	QL_UART_PARITY_EVEN,
+	QL_UART_PARITY_ODD,
+}QL_UART_PARITYBIT_E;
+
+typedef struct ql_uart_config_struct
+{
+	QL_UART_BAUD_E baudrate;
+	QL_UART_DATABIT_E data_bit;
+	QL_UART_STOPBIT_E stop_bit;
+	QL_UART_PARITYBIT_E parity_bit;
+	QL_UART_FLOWCTRL_E flow_ctrl;
+}ql_uart_config_t;
+
+typedef void (*uart_callback)(QL_UART_PORT_NUMBER_E port, void *para);
+
+/*****************************************************************
+* Function: ql_uart_open
+*
+* Description:
+* 	该函数用于打开 UART 设备并进行相关属性配置。
+* 
+* Parameters:
+* 	port	  	[In] 	串口选择。
+* 	baudrate  	[in] 	波特率设置。
+* 	flow_ctrl  	[in] 	流控设置。
+* Return:
+* 	0 函数执行成功
+*	-1 函数执行失败
+*
+*****************************************************************/
+int ql_uart_open(QL_UART_PORT_NUMBER_E port, QL_UART_BAUD_E baudrate, QL_UART_FLOWCTRL_E flow_ctrl);
+
+/*****************************************************************
+* Function: ql_uart_close
+*
+* Description:
+* 	该函数用于关闭指定的串口设备。
+* 
+* Parameters:
+* 	port	  	[In] 	串口选择。
+* Return:
+* 	0 函数执行成功
+*	-1 函数执行失败
+*
+*****************************************************************/
+int ql_uart_close(QL_UART_PORT_NUMBER_E port);
+
+/*****************************************************************
+* Function: ql_uart_set_dcbconfig
+*
+* Description:
+* 	该函数用于设置串口属性。
+* 
+* Parameters:
+* 	port	  	[In] 	串口选择。
+* 	dcb		  	[In] 	串口属性配置结构体。
+* Return:
+* 	0 函数执行成功
+*	-1 函数执行失败
+*
+*****************************************************************/
+int ql_uart_set_dcbconfig(QL_UART_PORT_NUMBER_E port, ql_uart_config_t *dcb);
+
+/*****************************************************************
+* Function: ql_uart_get_dcbconfig
+*
+* Description:
+* 	该函数用于获取串口属性配置。
+* 
+* Parameters:
+* 	port	  	[In] 	串口选择。
+* 	dcb		  	[Out] 	串口属性配置结构体。
+* Return:
+* 	0 函数执行成功
+*	-1 函数执行失败
+*
+*****************************************************************/
+int ql_uart_get_dcbconfig(QL_UART_PORT_NUMBER_E port, ql_uart_config_t *dcb);
+
+/*****************************************************************
+* Function: ql_uart_write
+*
+* Description:
+* 	该函数用于向指定 UART 串口写入数据。
+* 
+* Parameters:
+* 	port	  	[In] 	串口选择。
+* 	data	  	[In] 	待写入的数据。
+* 	len	  		[In] 	待写入数据的长度。
+* Return:
+* 	0 函数执行成功
+*	-1 函数执行失败
+*
+*****************************************************************/
+int ql_uart_write(QL_UART_PORT_NUMBER_E port, unsigned char *data, int len);
+
+/*****************************************************************
+* Function: ql_uart_read
+*
+* Description:
+* 	该函数用于通过指定 UART 读取数据。
+* 
+* Parameters:
+* 	port	  	[In] 	串口选择。
+* 	data	  	[Out] 	待读取的数据。
+* 	len	  		[In] 	待读取数据的长度。
+* Return:
+* 	>0 若执行成功，返回实际写入的字节数；
+*	-1 函数执行失败
+*
+*****************************************************************/
+int ql_uart_read(QL_UART_PORT_NUMBER_E port, unsigned char *data, int len);
+
+/*****************************************************************
+* Function: ql_uart_register_cb
+*
+* Description:
+* 	该函数用于配置轮询模式或者中断模式，为 UART 读取数据的回调函数。
+* 
+* Parameters:
+* 	port	  	[In] 	串口选择。
+* 	uart_cb		[In] 	需要注册的回调函数，若为 NULL，则为轮询模式。
+* Return: NONE
+*
+*****************************************************************/
+void ql_uart_register_cb(QL_UART_PORT_NUMBER_E port, uart_callback uart_cb);

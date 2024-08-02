@@ -370,13 +370,6 @@ static void dtu_485_task(void *ptr)
 //                        }
                         //发送数据到串口
                         UART_SEND_DATA(ctx->send_buf, send_len);
-                        //根据第一个字节来确定，收到了哪台设备的回复，标记时间，存储
-                        timestamp = utils_utc8_2_timestamp();
-                        id = *ctx->send_buf;
-                        
-                        sw_dtu_alive[id].timercv = timestamp;
-                        uprintf("poll %d: %d\r\n", id, sw_dtu_alive[id].timercv);
-                        
                     }
                 }
                 else if(DTU_MODBUS_POOLLING_WN_STATE == st_dtu_md.state)
@@ -450,17 +443,17 @@ static void dtu_485_task(void *ptr)
 //                        }
                         //发送数据到串口
                         UART_SEND_DATA(ctx->send_buf, send_len);
-                        //根据第一个字节来确定，收到了哪台设备的回复，标记时间，存储
-                        timestamp = utils_utc8_2_timestamp();
-                        id = *ctx->send_buf;
-                        
-                        sw_dtu_alive[id].timercv = timestamp;
-                        uprintf("poll %d: %d\r\n", id, sw_dtu_alive[id].timercv);
                     }
                 }
             }
             else if(DTU_MODBUS_DATA_MSG == uart_data.id && NULL != uart_data.UArgs)
             {
+                //根据第一个字节来确定，收到了哪台设备的回复，标记时间，存储
+                timestamp = utils_utc8_2_timestamp();
+                id = *((UINT8*)uart_data.UArgs);
+                
+                sw_dtu_alive[id - 1].timercv = timestamp;
+                uprintf("%s[%d] res %d: %ld\r\n", __FUNCTION__, __LINE__, id, sw_dtu_alive[id - 1].timercv);
 //                uprintf("%s[%d] modbus res", __FUNCTION__, __LINE__);
 //                
 //                UINT8* p = uart_data.UArgs;
@@ -535,19 +528,25 @@ static void dtu_alive_task(void *ptr)
         //for循环查询列表中哪些指令激活，按照激活指令参数配置 指令
         for(i = 0; i < SW_DTU_NUM_MAX; i++)
         {
-            //当前列表第i指令被激活
-            if(DTU_MODBUS_ACTIVE == dtu_file_ctx->modbus.cmd[i].active)
+            //获取当前时间
+            timestamp = utils_utc8_2_timestamp();
+            //联网获取了时间后
+            if(timestamp > 1000000)
             {
-                //获取当前时间
-                timestamp = utils_utc8_2_timestamp();
                 if(timestamp -  sw_dtu_alive[i].timercv > SW_DTU_TIMEOUT)
                 {
                     sw_dtu_alive[i].alive = 0;
+//                    uprintf("%s[%d] %d no alive", __FUNCTION__, __LINE__, i);
                 }
-                uprintf("%s[%d] slave addr: %d id: %d cmd: 0x%02X\n", __FUNCTION__, __LINE__, dtu_file_ctx->modbus.cmd[i].slave_addr, st_dtu_md.id + 1, dtu_file_ctx->modbus.cmd[i].fn);
+                else
+                {
+                    sw_dtu_alive[i].alive = 1;
+                    uprintf("%s[%d] slave addr: %d  t1:%ld t2:%ld alive:%d\n", __FUNCTION__, __LINE__, i + 1, timestamp, sw_dtu_alive[i].timercv, sw_dtu_alive[i].alive);
+//                    uprintf("%s[%d] %d alive", __FUNCTION__, __LINE__, i);
+                }
             }
         }
-        sleep(1);
+        sleep(3);
     }
 }
 

@@ -1023,6 +1023,7 @@ static void check_serial_mode(DTU_MSG_UART_DATA_PARAM_T *msgUartData)
   * Auther      : zhaoning
   * Others      : 
   **/
+#ifdef DTU_TYPE_MODBUS_INCLUDE
 void dtu_handle_serial_data(DTU_MSG_UART_DATA_PARAM_T *uartData)
 {
     DTU_MSG_UART_DATA_PARAM_T uart_send_temp = {0};
@@ -1039,32 +1040,20 @@ void dtu_handle_serial_data(DTU_MSG_UART_DATA_PARAM_T *uartData)
     if (dtu_uart_ctx->uart_mode == DTU_DATA_MODE)
     {
         uprintf("It time, dtu_serial_mode is DTU_DATA_MODE!\n");
-#if 0
-#ifdef DTU_TYPE_MODBUS_INCLUDE
+
         if(DTU_MODBUS_TYPE_ENABLE == dtu_file_ctx->modbus.config.type)
         {
             uart_send_temp.UArgs = malloc(uartData->len);
             memcpy(uart_send_temp.UArgs, uartData->UArgs, uartData->len);
             uart_send_temp.len = uartData->len;
             uart_send_temp.id = DTU_MODBUS_DATA_MSG;
-            dtu_modbus_task_send_msgq(&uart_send_temp);//发送串口收到的数据给Modbus任务进行处理
-        }
-#endif /* ifdef DTU_TYPE_MODBUS_INCLUDE.2023-10-10 10:33:07 by: zhaoning */
-#ifdef DTU_TYPE_HTTP_INCLUDE
-#ifdef DTU_TYPE_MODBUS_INCLUDE
-        else if(DTU_HTTP_TYPE_ENABLE == dtu_file_ctx->http.config.type){
+#ifdef DTU_TYPE_485_INCLUDE
+            dtu_485_task_send_msgq(&uart_send_temp);//发送串口收到的数据给Modbus任务进行处理
 #else
-        if(DTU_HTTP_TYPE_ENABLE == dtu_file_ctx->http.config.type){
-#endif /* ifdef DTU_TYPE_MODBUS_INCLUDE.2023-11-6 16:15:39 by: zhaoning */
-            uart_send_temp.UArgs = malloc(uartData->len);
-            memcpy(uart_send_temp.UArgs, uartData->UArgs, uartData->len);
-            uart_send_temp.len = uartData->len;
-            dtu_http_s_task_send_msgq(&uart_send_temp);//发送串口收到的数据给HTTP任务进行处理
+            dtu_modbus_task_send_msgq(&uart_send_temp);//发送串口收到的数据给Modbus任务进行处理
+#endif /* ifdef DTU_TYPE_485_INCLUDE.2024-7-30 14:23:03 by: zhaoning */
         }
-#endif /* ifdef DTU_TYPE_HTTP_INCLUDE.2023-10-10 10:08:57 by: zhaoning */
-#if defined(DTU_TYPE_MODBUS_INCLUDE) || defined(DTU_TYPE_HTTP_INCLUDE)
         else
-#endif /* ifdef DTU_TYPE_HTTP_INCLUDE.2023-10-10 10:08:57 by: zhaoning */
         {
 #ifdef DTU_BASED_ON_TCP
             dtu_send_serial_data_to_server(uartData);
@@ -1073,7 +1062,6 @@ void dtu_handle_serial_data(DTU_MSG_UART_DATA_PARAM_T *uartData)
             dtu_mqtt_send_serial_data(uartData);
 #endif /* ifdef DTU_BASED_ON_MQTT.2023-10-27 18:11:00 by: zhaoning */
         }
-#endif /* ifdef 0.2024-1-15 15:21:49 by: zhaoning */
     }
     //如果是at模式，
     else if (dtu_uart_ctx->uart_mode == DTU_AT_MODE)
@@ -1104,6 +1092,126 @@ void dtu_handle_serial_data(DTU_MSG_UART_DATA_PARAM_T *uartData)
         }
     }
 }
+#endif /* ifdef DTU_TYPE_MODBUS_INCLUDE.2024-7-30 14:11:56 by: zhaoning */
+#ifdef DTU_TYPE_HTTP_INCLUDE
+void dtu_handle_serial_data(DTU_MSG_UART_DATA_PARAM_T *uartData)
+{
+    DTU_MSG_UART_DATA_PARAM_T uart_send_temp = {0};
+    DTU_UART_PARAM_T* dtu_uart_ctx = NULL;
+    DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
+
+    dtu_uart_ctx = dtu_get_uart_ctx();
+    dtu_file_ctx = dtu_get_file_ctx();
+    
+    //检查是否收到"+++"，退出透传，进入AT模式
+    check_serial_mode(uartData);
+
+    //如果是透传模式，就把数据发送到服务器
+    if (dtu_uart_ctx->uart_mode == DTU_DATA_MODE)
+    {
+        uprintf("It time, dtu_serial_mode is DTU_DATA_MODE!\n");
+
+        if(DTU_HTTP_TYPE_ENABLE == dtu_file_ctx->http.config.type)
+        {
+            uart_send_temp.UArgs = malloc(uartData->len);
+            memcpy(uart_send_temp.UArgs, uartData->UArgs, uartData->len);
+            uart_send_temp.len = uartData->len;
+            dtu_http_s_task_send_msgq(&uart_send_temp);//发送串口收到的数据给HTTP任务进行处理
+        }
+        else
+        {
+#ifdef DTU_BASED_ON_TCP
+            dtu_send_serial_data_to_server(uartData);
+#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 18:04:36 by: zhaoning */
+#ifdef DTU_BASED_ON_MQTT
+            dtu_mqtt_send_serial_data(uartData);
+#endif /* ifdef DTU_BASED_ON_MQTT.2023-10-27 18:11:00 by: zhaoning */
+        }
+    }
+    //如果是at模式，
+    else if (dtu_uart_ctx->uart_mode == DTU_AT_MODE)
+    {
+        uprintf("It time, dtu_serial_mode is DTU_AT_MODE!\n");
+        //如果在at模式下，又收到了“+++”，不响应
+        if(uartData->len == 3 && memcmp(uartData->UArgs, "+++", 3) == 0)
+        {
+            memset(dtu_at_cmd_tmp, 0, sizeof(dtu_at_cmd_tmp));
+            dtu_at_tmp_count = 0;
+        }
+        //如果在at模式下，收到了"\r\n"，解析at
+        else if(strstr((const char*)uartData->UArgs,"\r\n"))
+        {
+            sprintf(&(dtu_at_cmd_tmp[dtu_at_tmp_count]),"%s",(char *)uartData->UArgs);
+            uprintf("%s[%d] send AT command uargs:%s,len:%d\n", __FUNCTION__, __LINE__,dtu_at_cmd_tmp, strlen(dtu_at_cmd_tmp) );
+            dtu_process_at_cmd_mode(dtu_at_cmd_tmp, strlen(dtu_at_cmd_tmp));
+            dtu_at_tmp_count = 0;
+        }
+        //防止at指令过长，拼接，一般不会到这里
+        else
+        {
+            sprintf(&(dtu_at_cmd_tmp[dtu_at_tmp_count]),"%s",(char *)uartData->UArgs);
+            dtu_at_tmp_count += uartData->len;
+            if(dtu_at_tmp_count > DTU_CMD_LINE_MAX_LINE_SIZE - 1)
+                dtu_at_tmp_count = 0;
+            
+        }
+    }
+}
+#endif /* ifdef DTU_TYPE_HTTP_INCLUDE.2024-7-30 14:13:12 by: zhaoning */
+#if !defined(DTU_TYPE_MODBUS_INCLUDE) && !defined(DTU_TYPE_HTTP_INCLUDE)
+void dtu_handle_serial_data(DTU_MSG_UART_DATA_PARAM_T *uartData)
+{
+    DTU_MSG_UART_DATA_PARAM_T uart_send_temp = {0};
+    DTU_UART_PARAM_T* dtu_uart_ctx = NULL;
+    DTU_FILE_PARAM_T* dtu_file_ctx = NULL;
+
+    dtu_uart_ctx = dtu_get_uart_ctx();
+    dtu_file_ctx = dtu_get_file_ctx();
+    
+    //检查是否收到"+++"，退出透传，进入AT模式
+    check_serial_mode(uartData);
+
+    //如果是透传模式，就把数据发送到服务器
+    if (dtu_uart_ctx->uart_mode == DTU_DATA_MODE)
+    {
+        uprintf("It time, dtu_serial_mode is DTU_DATA_MODE!\n");
+#ifdef DTU_BASED_ON_TCP
+        dtu_send_serial_data_to_server(uartData);
+#endif /* ifdef DTU_BASED_ON_TCP.2023-10-27 18:04:36 by: zhaoning */
+#ifdef DTU_BASED_ON_MQTT
+        dtu_mqtt_send_serial_data(uartData);
+#endif /* ifdef DTU_BASED_ON_MQTT.2023-10-27 18:11:00 by: zhaoning */
+    }
+    //如果是at模式，
+    else if (dtu_uart_ctx->uart_mode == DTU_AT_MODE)
+    {
+        uprintf("It time, dtu_serial_mode is DTU_AT_MODE!\n");
+        //如果在at模式下，又收到了“+++”，不响应
+        if(uartData->len == 3 && memcmp(uartData->UArgs, "+++", 3) == 0)
+        {
+            memset(dtu_at_cmd_tmp, 0, sizeof(dtu_at_cmd_tmp));
+            dtu_at_tmp_count = 0;
+        }
+        //如果在at模式下，收到了"\r\n"，解析at
+        else if(strstr((const char*)uartData->UArgs,"\r\n"))
+        {
+            sprintf(&(dtu_at_cmd_tmp[dtu_at_tmp_count]),"%s",(char *)uartData->UArgs);
+            uprintf("%s[%d] send AT command uargs:%s,len:%d\n", __FUNCTION__, __LINE__,dtu_at_cmd_tmp, strlen(dtu_at_cmd_tmp) );
+            dtu_process_at_cmd_mode(dtu_at_cmd_tmp, strlen(dtu_at_cmd_tmp));
+            dtu_at_tmp_count = 0;
+        }
+        //防止at指令过长，拼接，一般不会到这里
+        else
+        {
+            sprintf(&(dtu_at_cmd_tmp[dtu_at_tmp_count]),"%s",(char *)uartData->UArgs);
+            dtu_at_tmp_count += uartData->len;
+            if(dtu_at_tmp_count > DTU_CMD_LINE_MAX_LINE_SIZE - 1)
+                dtu_at_tmp_count = 0;
+            
+        }
+    }
+}
+#endif
 
 #ifdef DTU_BASED_ON_TCP
 /**

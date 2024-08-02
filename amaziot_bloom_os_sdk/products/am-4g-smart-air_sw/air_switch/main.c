@@ -123,14 +123,15 @@ void Phase2Inits_exit(void)
 {
     OSA_STATUS status = 0;
 
+    //初始化OLED任务
+    air_sw_task_init();
+    
     //初始化信息存储文件，包括激活码，各种标志位等
     dtu_trans_conf_file_init();
 #ifdef DTU_TYPE_3IN1
     //初始化sim卡
     dtu_trans_sim_init();
 #endif
-    //初始化OLED任务
-    air_sw_task_init();
     //初始化led灯控制io
     dtu_trans_net_led_init();  
     //初始化AT 透传串口
@@ -142,6 +143,9 @@ void Phase2Inits_exit(void)
     //输出型号到AT串口
     dtu_version_to_at_uart();
 
+    //网络保持任务初始化
+    dtu_checknet_task_init();
+    
 #ifdef DTU_BASED_ON_TCP
     //初始化TCP任务
     dtu_sokcet_task_init();
@@ -162,8 +166,6 @@ void Phase2Inits_exit(void)
     dtu_http_s_task_init();
 #endif /* ifdef DTU_TYPE_HTTP_INCLUDE.2023-10-10 10:07:28 by: zhaoning */
 
-    //网络保持任务初始化
-    dtu_checknet_task_init();
     //输出个日志
     uprintf("%s[%d]: starting...\n", __FUNCTION__, __LINE__);
 

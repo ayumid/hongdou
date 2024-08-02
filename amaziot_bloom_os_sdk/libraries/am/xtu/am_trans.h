@@ -33,7 +33,7 @@ extern "C" {
 
 // Public functions prototypes --------------------------------------------------
 
-void dtu_uart_data_recv_thread(void);
+void dtu_uart_data_recv_thread(void* ptr);
 void dtu_uart_data_recv_cbk(UINT8 *data, UINT32 len);
 void dtu_trans_uart_init(void);
 

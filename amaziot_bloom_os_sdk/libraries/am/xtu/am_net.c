@@ -125,9 +125,12 @@ PRO_START:
     dtu_set_socket_fn();
     //电量网络指示灯
     GpioSetLevel(GPIO_LINK_PIN, 0);
-//    uprintf("udp00");
+
     //根据标志位设置是否需要打开心跳定时器
-//    dtu_hb_timer_start();
+    if(dtu_file_ctx->hb.heartflag == 1)
+    {
+        dtu_hb_timer_start();
+    }
     //根据标志位设置是否拼接注册包
     if(dtu_file_ctx->reg.linkflag == 1 || dtu_file_ctx->reg.linkflag == 3)
     {
@@ -216,11 +219,14 @@ PRO_START:
     dtu_send_to_uart("\r\nCONNECT OK\r\n", 14);
     //点亮网络灯
     GpioSetLevel(GPIO_LINK_PIN, 1);
-    OSATaskSleep(100);//delay for sub error//dmh20210329
+    OSATaskSleep(100);//delay for sub error
     //订阅Topic
     dtu_mqtt_subscribe_topic();
     //根据设置，确定是否打开心跳定时器
-//    dtu_hb_timer_start();
+    if(1 == dtu_mqtt_file_ctx->hb.heartflag)
+    {
+        dtu_hb_timer_start();
+    }
     //根据设置，确定是否需要发送注册包
     if(dtu_mqtt_file_ctx->reg.linkflag == 1 || dtu_mqtt_file_ctx->reg.linkflag == 3)
     {

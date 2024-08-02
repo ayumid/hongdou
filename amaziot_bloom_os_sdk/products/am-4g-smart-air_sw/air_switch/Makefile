@@ -14,9 +14,9 @@ DTU_CJSON := yes#包含CJSON，定义这个宏定义
 DTU_485 := yes#包含Modbus功能，定义这个宏定义
 #DTU_HTTP := yes#包含HTTP功能，定义这个宏定义，HTTP作为TCP或MQTT附加功能出现
 
-DTU_EXSIM := yes#使用外置卡功能，定义这个宏定义
+#DTU_EXSIM := yes#使用外置卡功能，定义这个宏定义
 #DTU_5X6 := yes#使用5x6卡功能，定义这个宏定义
-#DTU_3IN1 := yes#使用3和1卡功能，定义这个宏定义
+DTU_3IN1 := yes#使用3和1卡功能，定义这个宏定义
 
 DTU_115200 := yes#使用波特率115200，定义这个宏定义
 #DTU_38400 := yes#使用波特率38400，定义这个宏定义
